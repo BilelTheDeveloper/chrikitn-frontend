@@ -202,7 +202,14 @@ const VipFeed = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 {user?.role === 'Freelancer' ? (
                   <div className="space-y-4">
-                    <input required name="globalService" placeholder="Primary Service" value={formData.globalService} onChange={handleInputChange} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-white text-sm outline-none focus:border-amber-500/50" />
+                    <div className="flex justify-between items-end px-1">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Affiliation / Entity</span>
+                      <span className={`text-[9px] font-mono ${formData.globalService.length >= 140 ? 'text-amber-500' : 'text-slate-600'}`}>
+                        {formData.globalService.length}/150
+                      </span>
+                    </div>
+                    <input required maxLength={150} name="globalService" placeholder="Primary Service" value={formData.globalService} onChange={handleInputChange} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-white text-sm outline-none focus:border-amber-500/50" />
+                    
                     <textarea required name="serviceDescription" placeholder="Intel Summary..." value={formData.serviceDescription} onChange={handleInputChange} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-white text-sm min-h-[100px] outline-none focus:border-amber-500/50" />
                     {formData.portfolioLinks.map((link, i) => (
                       <input key={i} placeholder="Link URL" value={link} onChange={(e) => handleLinkChange(i, e.target.value)} className="w-full bg-slate-950 border border-white/5 rounded-xl p-3 text-xs text-amber-200 outline-none" />
@@ -211,7 +218,14 @@ const VipFeed = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <input required name="brandName" placeholder="Brand / Entity Name" value={formData.brandName} onChange={handleInputChange} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-white text-sm outline-none focus:border-amber-500/50" />
+                    <div className="flex justify-between items-end px-1">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Affiliation / Entity</span>
+                      <span className={`text-[9px] font-mono ${formData.brandName.length >= 140 ? 'text-amber-500' : 'text-slate-600'}`}>
+                        {formData.brandName.length}/150
+                      </span>
+                    </div>
+                    <input required maxLength={150} name="brandName" placeholder="Brand / Entity Name" value={formData.brandName} onChange={handleInputChange} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-white text-sm outline-none focus:border-amber-500/50" />
+                    
                     <input required name="brandSocialLink" placeholder="Portal / Portfolio Link" value={formData.brandSocialLink} onChange={handleInputChange} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-white text-sm outline-none focus:border-amber-500/50" />
                     <textarea required name="searchingFor" placeholder="Operational Objective..." value={formData.searchingFor} onChange={handleInputChange} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-white text-sm min-h-[120px] outline-none focus:border-amber-500/50" />
                   </div>
