@@ -139,7 +139,7 @@ const VipFeed = () => {
   };
 
   return (
-    <div className="mx-auto space-y-12 pt-4 transition-all duration-700 w-full max-w-7xl relative px-4">
+    <div className=" overflow-hidden mx-auto space-y-12 pt-4 transition-all duration-700 w-full max-w-7xl relative ">
       
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[120px] -z-10 animate-pulse" />
       <div className="absolute bottom-[20%] right-[-5%] w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[100px] -z-10" />
