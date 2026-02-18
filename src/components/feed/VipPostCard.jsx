@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Crown, MessageSquare, Share2, 
   Heart, ShieldCheck, Zap, ExternalLink, 
-  Rocket, Send, Film, Target
+  Rocket, Send, Film, Target, ChevronDown, ChevronUp
 } from 'lucide-react';
 
 // ✅ CLOUDINARY & BASE_URL UPDATE
@@ -12,6 +12,7 @@ import { getImageUrl } from '../../config/config';
 
 const VipPostCard = ({ post }) => {
   const [isLiked, setIsLiked] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false); // New state for Show More
   const navigate = useNavigate();
   
   const userData = JSON.parse(localStorage.getItem('user'));
@@ -49,15 +50,17 @@ const VipPostCard = ({ post }) => {
     }
   };
 
+  const descriptionText = post.searchingFor || post.serviceDescription || "Confidential Protocol Active";
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative mb-10 group"
+      className="relative mb-10 group flex flex-col h-full w-full"
     >
       <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600 to-amber-400 rounded-[3rem] blur opacity-0 group-hover:opacity-10 transition duration-1000"></div>
       
-      <div className="relative bg-slate-950 border border-white/5 backdrop-blur-3xl rounded-[3rem] p-8 overflow-hidden shadow-2xl">
+      <div className="relative bg-slate-950 border border-white/5 backdrop-blur-3xl rounded-[3rem] p-8 overflow-hidden shadow-2xl flex flex-col h-full">
         
         {/* 1. USER IDENTITY SECTION */}
         <div className="flex items-center justify-between mb-8">
@@ -86,7 +89,6 @@ const VipPostCard = ({ post }) => {
                 <ShieldCheck size={16} className="text-amber-500" />
               </div>
               
-              {/* 🏷️ BADGE PROTOCOL DISPLAY */}
               <div className="flex items-center gap-2 mt-0.5">
                 <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
                   {post.intelType || post.user?.role} Protocol
@@ -120,16 +122,33 @@ const VipPostCard = ({ post }) => {
           </h3>
         </div>
 
-        {/* 3. OPERATIONAL NEED */}
-        <div className="mb-8 p-6 bg-slate-900/50 rounded-[2rem] border border-white/5 relative overflow-hidden">
+        {/* 3. OPERATIONAL NEED - UPDATED FOR SHOW MORE & UNIFORM SIZE */}
+        <div className="mb-8 p-6 bg-slate-900/50 rounded-[2rem] border border-white/5 relative overflow-hidden flex-grow">
           <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-3 flex items-center gap-2">
             <span className="w-1 h-1 bg-amber-500 rounded-full animate-pulse" />
             Operational Objective
           </p>
-          <p className="text-slate-200 text-base leading-relaxed font-medium italic">
-            "{post.searchingFor || post.serviceDescription || "Confidential Protocol Active"}"
-          </p>
-          <div className="absolute top-0 right-0 p-4 opacity-10">
+          
+          <div className="relative">
+            <p className={`text-slate-200 text-base leading-relaxed font-medium italic transition-all duration-300 ${!isExpanded ? 'line-clamp-3' : ''}`}>
+              "{descriptionText}"
+            </p>
+            
+            {descriptionText.length > 120 && (
+              <button 
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="mt-3 flex items-center gap-1 text-[9px] font-black text-amber-500 uppercase tracking-widest hover:text-amber-400 transition-colors"
+              >
+                {isExpanded ? (
+                  <>Hide Intel <ChevronUp size={12} /></>
+                ) : (
+                  <>Show Full Intel <ChevronDown size={12} /></>
+                )}
+              </button>
+            )}
+          </div>
+
+          <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
             <Rocket size={40} className="text-white" />
           </div>
         </div>
@@ -189,7 +208,7 @@ const VipPostCard = ({ post }) => {
         <button 
           onClick={handleRequestClick}
           disabled={isOwnPost}
-          className={`w-full py-5 font-black uppercase tracking-[0.4em] text-xs rounded-2xl transition-all flex items-center justify-center gap-3 
+          className={`w-full py-5 font-black uppercase tracking-[0.4em] text-xs rounded-2xl transition-all flex items-center justify-center gap-3 mt-auto
             ${isOwnPost 
               ? 'bg-slate-900 text-slate-600 border border-white/5 cursor-not-allowed' 
               : 'bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-black shadow-[0_0_30px_rgba(245,158,11,0.2)] hover:shadow-[0_0_40px_rgba(245,158,11,0.4)] active:scale-[0.98]'
