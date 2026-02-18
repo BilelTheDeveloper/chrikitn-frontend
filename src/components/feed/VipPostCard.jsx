@@ -55,7 +55,7 @@ const VipPostCard = ({ post }) => {
       animate={{ opacity: 1, y: 0 }}
       className="relative mb-10 group"
     >
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-600 to-amber-400 rounded-[3rem] blur opacity-0  transition duration-1000"></div>
+      <div className="p-2 absolute -inset-0.5 bg-gradient-to-r from-amber-600 to-amber-400 rounded-[3rem] blur opacity-0  transition duration-1000"></div>
       
       <div className="relative bg-slate-950 border border-white/5 backdrop-blur-3xl rounded-[3rem] p-8 overflow-hidden shadow-2xl">
         
@@ -66,11 +66,11 @@ const VipPostCard = ({ post }) => {
             className="flex items-center gap-4 cursor-pointer group/identity"
           >
             <div className="relative">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-amber-500/20 bg-slate-900 p-0.5 shadow-inner">
+              <div className="w-19 h-19 rounded-2xl overflow-hidden border-2 border-amber-500/20 bg-slate-900 p-0.5 shadow-inner">
                 <img 
                   src={getImageUrl(post.user?.identityImage) || `https://ui-avatars.com/api/?name=${post.user?.name || 'U'}&background=0f172a&color=f59e0b&bold=true`} 
                   alt="Operative" 
-                  className="w-full h-full object-cover rounded-xl transition-all duration-500 group-hover/identity:scale-110"
+                  className="w-full h-full object-cover rounded-xl transition-all duration-500 group-hover/identity:scale-120"
                 />
               </div>
               <div className="absolute -bottom-1 -right-1 bg-amber-500 rounded-lg p-1 border-2 border-slate-950 shadow-lg">
