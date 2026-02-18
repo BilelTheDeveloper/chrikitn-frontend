@@ -181,11 +181,11 @@ const VipFeed = () => {
         </div>
       </div>
 
-      {/* 🚀 FEED GRID SYSTEM: UPDATED TO ENSURE SAME CARD SIZE */}
-      <div className={`grid gap-6 ${colCount === 2 ? 'md:grid-cols-2 grid-rows-[1fr]' : 'grid-cols-1'} items-stretch w-full`}>
+      {/* 🚀 FEED GRID SYSTEM: UPDATED FOR PERFECT UNIFORMITY */}
+      <div className={`grid gap-6 w-full ${colCount === 2 ? 'md:grid-cols-2 md:auto-rows-fr' : 'grid-cols-1'}`}>
         {vipPosts.length > 0 ? (
           vipPosts.map(post => (
-            <div key={post._id} className="h-full flex flex-col">
+            <div key={post._id} className="flex w-full overflow-hidden rounded-[3rem]">
               <VipPostCard post={post} />
             </div>
           ))
@@ -211,7 +211,6 @@ const VipFeed = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 {user?.role === 'Freelancer' ? (
                   <div className="space-y-4">
-                    {/* INPUT 1: AFFILIATION */}
                     <div className="flex justify-between items-end px-1">
                       <span className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Affiliation / Entity</span>
                       <span className={`text-[9px] font-mono ${formData.globalService.length >= 140 ? 'text-amber-500' : 'text-slate-600'}`}>
@@ -220,7 +219,6 @@ const VipFeed = () => {
                     </div>
                     <input required maxLength={150} name="globalService" placeholder="Primary Service" value={formData.globalService} onChange={handleInputChange} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-white text-sm outline-none focus:border-amber-500/50" />
                     
-                    {/* INPUT 2: SERVICE DESCRIPTION (150-250 chars) */}
                     <div className="flex justify-between items-end px-1 mt-4">
                       <span className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Intel Summary</span>
                       <span className={`text-[9px] font-mono ${formData.serviceDescription.length < 150 ? 'text-red-500' : 'text-amber-500'}`}>
