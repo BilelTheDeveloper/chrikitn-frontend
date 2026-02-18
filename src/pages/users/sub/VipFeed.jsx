@@ -20,7 +20,7 @@ const VipFeed = () => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [fileType, setFileType] = useState('image'); 
   
-  // 🎚️ UPDATED: Column State (1 or 2)
+  // 🎚️ Column State (1 or 2)
   const [colCount, setColCount] = useState(1);
 
   const initialFormState = {
@@ -127,8 +127,8 @@ const VipFeed = () => {
   };
 
   return (
-    // 🌍 UPDATED: Container now supports full-width breathing room
-    <div className={`mx-auto space-y-10 pb-32 px-4 pt-6 transition-all duration-500 w-full ${colCount === 1 ? 'max-w-4xl' : 'max-w-[95%]'}`}>
+    // 🌍 UPDATED: Container width increased to 98% for maximum space in 2-row mode
+    <div className={`mx-auto space-y-10 pb-32 px-4 pt-6 transition-all duration-500 w-full ${colCount === 1 ? 'max-w-4xl' : 'max-w-[98%]'}`}>
       
       {/* ELITE VIP HEADER */}
       <div className="relative p-1 rounded-[3rem] bg-gradient-to-br from-amber-600 via-amber-300 to-amber-700 shadow-2xl">
@@ -145,7 +145,7 @@ const VipFeed = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              {/* 🕹️ UPDATED: 1 or 2 Card Switcher */}
+              {/* 🕹️ Switcher: 1 or 2 cards */}
               <div className="hidden md:flex items-center bg-white/5 p-1.5 rounded-2xl border border-white/10 gap-1">
                 <button 
                   onClick={() => setColCount(1)}
@@ -176,8 +176,8 @@ const VipFeed = () => {
         </div>
       </div>
 
-      {/* 🚀 UPDATED: FEED GRID SYSTEM (1 or 2 Columns) */}
-      <div className={`grid gap-8 ${colCount === 2 ? 'md:grid-cols-2' : 'grid-cols-1'} w-full`}>
+      {/* 🚀 FEED GRID SYSTEM: Tightened gap to maximize card width */}
+      <div className={`grid gap-6 ${colCount === 2 ? 'md:grid-cols-2' : 'grid-cols-1'} w-full`}>
         {vipPosts.length > 0 ? (
           vipPosts.map(post => <VipPostCard key={post._id} post={post} />)
         ) : (
@@ -188,7 +188,7 @@ const VipFeed = () => {
         )}
       </div>
 
-      {/* MODAL FORM (Unchanged) */}
+      {/* MODAL FORM */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
