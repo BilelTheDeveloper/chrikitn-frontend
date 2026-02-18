@@ -139,10 +139,10 @@ const VipFeed = () => {
   };
 
   return (
-    <div className=" overflow-hidden mx-auto space-y-12 pt-4 transition-all duration-700 w-full max-w-7xl relative ">
+    <div className=" p-2 overflow-hidden mx-auto space-y-12 pt-4 transition-all duration-700 w-full max-w-7xl relative ">
       
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[120px] -z-10 animate-pulse" />
-      <div className="absolute bottom-[20%] right-[-5%] w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[100px] -z-10" />
+      <div className=" absolute top-[-10%] left-[-10%] w-full h-[500px] bg-amber-500/5 rounded-full blur-[120px] -z-10 animate-pulse" />
+      <div className="absolute bottom-[20%] right-[-5%] w-full h-[400px] bg-blue-500/5 rounded-full blur-[100px] -z-10" />
 
       <section className="relative group w-full">
         <div className="absolute -inset-1 bg-gradient-to-r from-amber-600 via-amber-300 to-amber-700 rounded-[3.5rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
@@ -162,7 +162,7 @@ const VipFeed = () => {
                 VIP <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600">SECTOR</span>
               </h1>
               <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                <Activity size={12} className="text-green-500" /> Live Operational Database • {vipPosts.length} Nodes Active
+                
               </p>
             </div>
 
