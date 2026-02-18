@@ -134,7 +134,7 @@ const VipFeed = () => {
   };
 
   return (
-    <div className={`mx-auto space-y-10 pb-32 px-4 pt-6 transition-all duration-500 w-full ${colCount === 1 ? 'max-w-4xl' : 'max-w-[98%]'}`}>
+    <div className={`mx-auto space-y-10   pt-2 transition-all duration-500 w-full ${colCount === 1 ? 'max-w-3xl' : 'max-w-[108%]'}`}>
       
       {/* ELITE VIP HEADER */}
       <div className="relative p-1 rounded-[3rem] bg-gradient-to-br from-amber-600 via-amber-300 to-amber-700 shadow-2xl">
@@ -182,7 +182,7 @@ const VipFeed = () => {
       </div>
 
       {/* 🚀 FEED GRID SYSTEM: UPDATED FOR PERFECT UNIFORMITY */}
-      <div className={`grid gap-6 w-full ${colCount === 2 ? 'md:grid-cols-2 md:auto-rows-fr' : 'grid-cols-1'}`}>
+      <div className={`grid gap-9 w-full ${colCount === 2 ? 'md:grid-cols-2 md:auto-rows-fr' : 'grid-cols-1'}`}>
         {vipPosts.length > 0 ? (
           vipPosts.map(post => (
             <div key={post._id} className="flex w-full overflow-hidden rounded-[3rem]">
