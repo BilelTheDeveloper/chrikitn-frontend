@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Crown, Lock, Plus, X, Zap, 
-  Image as ImageIcon, Film, LayoutGrid, columns, Grid2X2, Grid3X3
+  Image as ImageIcon, Film, Square, Columns
 } from 'lucide-react';
 
 // ✅ UPDATED IMPORTS
@@ -20,8 +20,8 @@ const VipFeed = () => {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [fileType, setFileType] = useState('image'); 
   
-  // 🎚️ NEW: Column State (Desktop only)
-  const [colCount, setColCount] = useState(3);
+  // 🎚️ UPDATED: Column State (1 or 2)
+  const [colCount, setColCount] = useState(1);
 
   const initialFormState = {
     globalService: '',
@@ -127,8 +127,8 @@ const VipFeed = () => {
   };
 
   return (
-    // 🌍 UPDATED: Container width now expands for Grid View
-    <div className={`mx-auto space-y-10 pb-32 px-4 pt-6 transition-all duration-500 ${colCount === 3 ? 'max-w-7xl' : 'max-w-5xl'}`}>
+    // 🌍 UPDATED: Container now supports full-width breathing room
+    <div className={`mx-auto space-y-10 pb-32 px-4 pt-6 transition-all duration-500 w-full ${colCount === 1 ? 'max-w-4xl' : 'max-w-[95%]'}`}>
       
       {/* ELITE VIP HEADER */}
       <div className="relative p-1 rounded-[3rem] bg-gradient-to-br from-amber-600 via-amber-300 to-amber-700 shadow-2xl">
@@ -145,19 +145,21 @@ const VipFeed = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              {/* 🕹️ NEW: GRID CONTROLS (Hidden on mobile) */}
+              {/* 🕹️ UPDATED: 1 or 2 Card Switcher */}
               <div className="hidden md:flex items-center bg-white/5 p-1.5 rounded-2xl border border-white/10 gap-1">
+                <button 
+                  onClick={() => setColCount(1)}
+                  className={`p-2 rounded-xl transition-all ${colCount === 1 ? 'bg-amber-500 text-black' : 'text-slate-500 hover:text-white'}`}
+                  title="Single Column"
+                >
+                  <Square size={18} />
+                </button>
                 <button 
                   onClick={() => setColCount(2)}
                   className={`p-2 rounded-xl transition-all ${colCount === 2 ? 'bg-amber-500 text-black' : 'text-slate-500 hover:text-white'}`}
+                  title="Dual Column"
                 >
-                  <Grid2X2 size={18} />
-                </button>
-                <button 
-                  onClick={() => setColCount(3)}
-                  className={`p-2 rounded-xl transition-all ${colCount === 3 ? 'bg-amber-500 text-black' : 'text-slate-500 hover:text-white'}`}
-                >
-                  <Grid3X3 size={18} />
+                  <Columns size={18} />
                 </button>
               </div>
 
@@ -174,8 +176,8 @@ const VipFeed = () => {
         </div>
       </div>
 
-      {/* 🚀 UPDATED: FEED GRID SYSTEM */}
-      <div className={`grid gap-6 ${colCount === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'} grid-cols-1`}>
+      {/* 🚀 UPDATED: FEED GRID SYSTEM (1 or 2 Columns) */}
+      <div className={`grid gap-8 ${colCount === 2 ? 'md:grid-cols-2' : 'grid-cols-1'} w-full`}>
         {vipPosts.length > 0 ? (
           vipPosts.map(post => <VipPostCard key={post._id} post={post} />)
         ) : (
@@ -186,7 +188,7 @@ const VipFeed = () => {
         )}
       </div>
 
-      {/* MODAL FORM (No changes to logic here) */}
+      {/* MODAL FORM (Unchanged) */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
