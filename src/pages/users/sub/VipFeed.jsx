@@ -89,6 +89,13 @@ const VipFeed = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 🛡️ FRONT-END VALIDATION FOR MINIMUM CHARACTERS
+    if (user?.role === 'Freelancer' && formData.serviceDescription.length < 150) {
+        toast.error("Intel Summary must be at least 150 characters.");
+        return;
+    }
+
     setLoading(true);
 
     const data = new FormData();
@@ -127,7 +134,6 @@ const VipFeed = () => {
   };
 
   return (
-    // 🌍 UPDATED: Container width increased to 98% for maximum space in 2-row mode
     <div className={`mx-auto space-y-10 pb-32 px-4 pt-6 transition-all duration-500 w-full ${colCount === 1 ? 'max-w-4xl' : 'max-w-[98%]'}`}>
       
       {/* ELITE VIP HEADER */}
@@ -145,7 +151,6 @@ const VipFeed = () => {
             </div>
 
             <div className="flex items-center gap-4">
-              {/* 🕹️ Switcher: 1 or 2 cards */}
               <div className="hidden md:flex items-center bg-white/5 p-1.5 rounded-2xl border border-white/10 gap-1">
                 <button 
                   onClick={() => setColCount(1)}
@@ -176,10 +181,14 @@ const VipFeed = () => {
         </div>
       </div>
 
-      {/* 🚀 FEED GRID SYSTEM: Tightened gap to maximize card width */}
-      <div className={`grid gap-6 ${colCount === 2 ? 'md:grid-cols-2' : 'grid-cols-1'} w-full`}>
+      {/* 🚀 FEED GRID SYSTEM: UPDATED TO ENSURE SAME CARD SIZE */}
+      <div className={`grid gap-6 ${colCount === 2 ? 'md:grid-cols-2 grid-rows-[1fr]' : 'grid-cols-1'} items-stretch w-full`}>
         {vipPosts.length > 0 ? (
-          vipPosts.map(post => <VipPostCard key={post._id} post={post} />)
+          vipPosts.map(post => (
+            <div key={post._id} className="h-full flex flex-col">
+              <VipPostCard post={post} />
+            </div>
+          ))
         ) : (
           <div className="col-span-full py-24 flex flex-col items-center justify-center border-2 border-amber-500/10 rounded-[3rem] border-dashed">
              <Lock size={32} className="text-amber-900/30 mb-4" />
@@ -202,6 +211,7 @@ const VipFeed = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 {user?.role === 'Freelancer' ? (
                   <div className="space-y-4">
+                    {/* INPUT 1: AFFILIATION */}
                     <div className="flex justify-between items-end px-1">
                       <span className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Affiliation / Entity</span>
                       <span className={`text-[9px] font-mono ${formData.globalService.length >= 140 ? 'text-amber-500' : 'text-slate-600'}`}>
@@ -210,7 +220,24 @@ const VipFeed = () => {
                     </div>
                     <input required maxLength={150} name="globalService" placeholder="Primary Service" value={formData.globalService} onChange={handleInputChange} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-white text-sm outline-none focus:border-amber-500/50" />
                     
-                    <textarea required name="serviceDescription" placeholder="Intel Summary..." value={formData.serviceDescription} onChange={handleInputChange} className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-white text-sm min-h-[100px] outline-none focus:border-amber-500/50" />
+                    {/* INPUT 2: SERVICE DESCRIPTION (150-250 chars) */}
+                    <div className="flex justify-between items-end px-1 mt-4">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter">Intel Summary</span>
+                      <span className={`text-[9px] font-mono ${formData.serviceDescription.length < 150 ? 'text-red-500' : 'text-amber-500'}`}>
+                        {formData.serviceDescription.length}/250 (Min 150)
+                      </span>
+                    </div>
+                    <textarea 
+                      required 
+                      minLength={150}
+                      maxLength={250} 
+                      name="serviceDescription" 
+                      placeholder="Why must brands work with you?" 
+                      value={formData.serviceDescription} 
+                      onChange={handleInputChange} 
+                      className="w-full bg-slate-950 border border-white/5 rounded-2xl p-4 text-white text-sm min-h-[120px] outline-none focus:border-amber-500/50" 
+                    />
+
                     {formData.portfolioLinks.map((link, i) => (
                       <input key={i} placeholder="Link URL" value={link} onChange={(e) => handleLinkChange(i, e.target.value)} className="w-full bg-slate-950 border border-white/5 rounded-xl p-3 text-xs text-amber-200 outline-none" />
                     ))}
