@@ -138,7 +138,7 @@ const VipFeed = () => {
   };
 
   return (
-    <div className="px-3 md:px-6 lg:px-8 overflow-x-hidden mx-auto space-y-8 md:space-y-12 pt-4 transition-all duration-700 w-full max-w-7xl relative">
+    <div className="px-3 md:px-6 lg:px-8 overflow-hidden mx-auto space-y-8 md:space-y-12 pt-4 transition-all duration-700 w-full max-w-7xl relative">
       
       {/* Background Glows */}
       <div className="absolute top-[-5%] left-[-10%] w-full h-[300px] md:h-[500px] bg-amber-500/5 rounded-full blur-[80px] md:blur-[120px] -z-10 animate-pulse" />
