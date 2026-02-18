@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import axios from 'axios';
-import { Send, Shield, Trash2, ArrowLeft, User } from 'lucide-react';
+import { Send, Shield, Trash2, ArrowLeft, User, CheckCircle } from 'lucide-react';
 
 // ✅ CONFIG INTEGRATION:
 import { API_BASE_URL, SOCKET_URL } from '../../config/config';
@@ -65,6 +65,36 @@ const ChatRoom = ({ connectionId: propId }) => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // --- NEW: TERMINATE PROTOCOL ---
+  const handleTerminate = async () => {
+    if (window.confirm("⚠️ CRITICAL: This will purge all messages and terminate this connection forever. Proceed?")) {
+      try {
+        await axios.delete(`${API_BASE_URL}/connections/terminate/${activeId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        // Redirect to notifications/dashboard after purge
+        navigate('/main/notifications');
+      } catch (err) {
+        console.error("Termination failed", err);
+        alert("System failed to purge the frequency.");
+      }
+    }
+  };
+
+  // --- NEW: DEAL DONE PROTOCOL ---
+  const handleToggleReady = async () => {
+    try {
+      const res = await axios.post(`${API_BASE_URL}/connections/ready/${activeId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data.success) {
+        alert("STATUS UPDATED: Ready for Elite Workspace. Waiting for partner confirmation.");
+      }
+    } catch (err) {
+      console.error("Ready toggle failed", err);
+    }
+  };
+
   // 2. Send Message Protocol
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -106,6 +136,34 @@ const ChatRoom = ({ connectionId: propId }) => {
 
   return (
     <div className="flex flex-col h-full bg-transparent">
+      {/* ✅ NEW: CHAT HEADER ACTIONS */}
+      <div className="flex items-center justify-between p-4 border-b border-white/5 bg-slate-900/40 backdrop-blur-md">
+        <div className="flex items-center gap-2">
+          <Shield size={16} className="text-amber-500" />
+          <span className="text-[10px] font-black uppercase tracking-[3px] text-slate-400">Secure Channel</span>
+        </div>
+        
+        <div className="flex items-center gap-3">
+          {/* DEAL DONE BUTTON */}
+          <button 
+            onClick={handleToggleReady}
+            className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-lg hover:bg-emerald-500 hover:text-white transition-all group"
+          >
+            <CheckCircle size={14} className="group-hover:scale-110 transition-transform" />
+            <span className="text-[9px] font-black uppercase tracking-widest">Deal Done</span>
+          </button>
+
+          {/* TERMINATE BUTTON */}
+          <button 
+            onClick={handleTerminate}
+            className="p-1.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-lg hover:bg-red-500 hover:text-white transition-all group"
+            title="Terminate & Purge"
+          >
+            <Trash2 size={14} className="group-hover:rotate-12 transition-transform" />
+          </button>
+        </div>
+      </div>
+
       {/* CHAT FEED */}
       <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6 custom-scrollbar bg-slate-950/20">
         {messages.map((msg, index) => {
