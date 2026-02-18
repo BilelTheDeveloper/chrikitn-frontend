@@ -147,7 +147,7 @@ const VipFeed = () => {
       {/* Hero Section */}
       <section className="relative group w-full">
         <div className="absolute -inset-1 bg-gradient-to-r from-amber-600 via-amber-300 to-amber-700 rounded-[2rem] md:rounded-[3.5rem] blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-        <div className="relative bg-slate-950/80 backdrop-blur-3xl p-6 md:p-10 rounded-[1.8rem] md:rounded-[3.2rem] border border-white/5 overflow-hidden shadow-2xl">
+        <div className="relative bg-slate-950/80 backdrop-blur-3xl p-4 md:p-7 rounded-[1.8rem] md:rounded-[3.2rem] border border-white/5 overflow-hidden shadow-2xl">
           
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 md:gap-8">
             <div className="space-y-3 md:space-y-4 text-center lg:text-left">
@@ -159,7 +159,7 @@ const VipFeed = () => {
                 <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.5em] text-amber-500/80">Premium Network Access</span>
               </div>
               
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white uppercase italic tracking-tighter leading-none">
+              <h1 className="text-3xl sm:text-2xl md:text-5xl font-black text-white uppercase italic tracking-tighter leading-none">
                 VIP <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600">SECTOR</span>
               </h1>
             </div>
