@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Crown, Lock, Plus, X, Zap, 
-  Image as ImageIcon, Film 
+  Image as ImageIcon, Film, LayoutGrid, columns, Grid2X2, Grid3X3
 } from 'lucide-react';
 
 // ✅ UPDATED IMPORTS
@@ -18,7 +18,10 @@ const VipFeed = () => {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-  const [fileType, setFileType] = useState('image'); // ✅ Track if file is image or video
+  const [fileType, setFileType] = useState('image'); 
+  
+  // 🎚️ NEW: Column State (Desktop only)
+  const [colCount, setColCount] = useState(3);
 
   const initialFormState = {
     globalService: '',
@@ -55,7 +58,6 @@ const VipFeed = () => {
 
   const addLinkField = () => setFormData({ ...formData, portfolioLinks: [...formData.portfolioLinks, ''] });
 
-  // ✅ ENHANCED FILE HANDLER WITH 50s VIDEO LIMIT
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -68,9 +70,9 @@ const VipFeed = () => {
 
       video.onloadedmetadata = () => {
         window.URL.revokeObjectURL(video.src);
-        if (video.duration > 50.5) { // Allowing a tiny margin
+        if (video.duration > 50.5) { 
           toast.error("Video exceeds 50-second limit.");
-          e.target.value = ""; // Clear input
+          e.target.value = ""; 
           return;
         }
         setFileType('video');
@@ -85,36 +87,27 @@ const VipFeed = () => {
     }
   };
 
-  // 2. Handle Broadcast (Create Post) - UPDATED FOR ARRAY STABILITY
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const data = new FormData();
-    
-    // ✅ File Intel
     if (imageFile) data.append('intelImage', imageFile);
-
-    // ✅ Sync with backend role-based logic
     const currentRole = user?.role || 'Simple';
     data.append('intelType', currentRole);
 
     if (currentRole === 'Freelancer') {
       data.append('globalService', formData.globalService);
       data.append('serviceDescription', formData.serviceDescription);
-      
-      // ✅ JSON stringify the array so the backend can parse it reliably
       const validLinks = formData.portfolioLinks.filter(link => link.trim() !== "");
       data.append('portfolioLinks', JSON.stringify(validLinks));
     } else {
-      // ✅ Unified Brand and Simple logic
       data.append('brandName', formData.brandName || user?.name || "Elite Entity");
       data.append('brandSocialLink', formData.brandSocialLink);
       data.append('searchingFor', formData.searchingFor);
     }
 
     try {
-      // ✅ api.js handles the token, headers ensure multipart
       await api.post('/vip/create', data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
@@ -134,12 +127,13 @@ const VipFeed = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-10 pb-32 px-4 pt-6">
+    // 🌍 UPDATED: Container width now expands for Grid View
+    <div className={`mx-auto space-y-10 pb-32 px-4 pt-6 transition-all duration-500 ${colCount === 3 ? 'max-w-7xl' : 'max-w-5xl'}`}>
       
       {/* ELITE VIP HEADER */}
       <div className="relative p-1 rounded-[3rem] bg-gradient-to-br from-amber-600 via-amber-300 to-amber-700 shadow-2xl">
         <div className="bg-slate-950 p-8 rounded-[2.8rem] relative overflow-hidden">
-          <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-amber-500">
                 <Crown size={18} />
@@ -150,31 +144,49 @@ const VipFeed = () => {
               </h1>
             </div>
 
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-400 text-black font-black uppercase text-[11px] tracking-widest rounded-2xl hover:scale-105 transition-transform shadow-lg"
-            >
-              <Plus size={16} strokeWidth={4} />
-              Deploy Intel
-            </button>
+            <div className="flex items-center gap-4">
+              {/* 🕹️ NEW: GRID CONTROLS (Hidden on mobile) */}
+              <div className="hidden md:flex items-center bg-white/5 p-1.5 rounded-2xl border border-white/10 gap-1">
+                <button 
+                  onClick={() => setColCount(2)}
+                  className={`p-2 rounded-xl transition-all ${colCount === 2 ? 'bg-amber-500 text-black' : 'text-slate-500 hover:text-white'}`}
+                >
+                  <Grid2X2 size={18} />
+                </button>
+                <button 
+                  onClick={() => setColCount(3)}
+                  className={`p-2 rounded-xl transition-all ${colCount === 3 ? 'bg-amber-500 text-black' : 'text-slate-500 hover:text-white'}`}
+                >
+                  <Grid3X3 size={18} />
+                </button>
+              </div>
+
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-400 text-black font-black uppercase text-[11px] tracking-widest rounded-2xl hover:scale-105 transition-transform shadow-lg"
+              >
+                <Plus size={16} strokeWidth={4} />
+                Deploy Intel
+              </button>
+            </div>
           </div>
           <Zap className="absolute right-[-20px] top-[-20px] text-amber-500/5 w-40 h-40 rotate-12" />
         </div>
       </div>
 
-      {/* FEED LIST */}
-      <div className="space-y-8">
+      {/* 🚀 UPDATED: FEED GRID SYSTEM */}
+      <div className={`grid gap-6 ${colCount === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'} grid-cols-1`}>
         {vipPosts.length > 0 ? (
           vipPosts.map(post => <VipPostCard key={post._id} post={post} />)
         ) : (
-          <div className="py-24 flex flex-col items-center justify-center border-2 border-amber-500/10 rounded-[3rem] border-dashed">
+          <div className="col-span-full py-24 flex flex-col items-center justify-center border-2 border-amber-500/10 rounded-[3rem] border-dashed">
              <Lock size={32} className="text-amber-900/30 mb-4" />
              <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">No Active Broadcasts Found</p>
           </div>
         )}
       </div>
 
-      {/* MODAL FORM */}
+      {/* MODAL FORM (No changes to logic here) */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
@@ -203,7 +215,6 @@ const VipFeed = () => {
                   </div>
                 )}
 
-                {/* ✅ UPDATED PREVIEW AREA FOR VIDEO SUPPORT */}
                 <label className="flex flex-col items-center justify-center p-6 rounded-3xl border-2 border-dashed border-white/5 bg-slate-950 cursor-pointer hover:border-amber-500/30 transition-all">
                   {previewUrl ? (
                     fileType === 'video' ? (
