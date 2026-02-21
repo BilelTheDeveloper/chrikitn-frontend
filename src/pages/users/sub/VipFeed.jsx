@@ -162,7 +162,7 @@ const VipFeed = () => {
               <h1 className="text-3xl sm:text-2xl md:text-5xl font-black text-white uppercase italic tracking-tighter leading-none">
                 VIP <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600">SECTOR</span>
               </h1>
-            </div>
+            </div>  
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5">
               {/* Layout Toggle */}
