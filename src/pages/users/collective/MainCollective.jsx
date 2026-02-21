@@ -35,7 +35,7 @@ const MainCollective = () => {
   useEffect(() => {
     const fetchCollectives = async () => {
       try {
-        const res = await api.get('/collectives'); // We will create this GET route next
+        const res = await api.get('/collectives');
         setCollectives(res.data);
       } catch (err) {
         console.error("Discovery Error");
@@ -46,27 +46,42 @@ const MainCollective = () => {
     fetchCollectives();
   }, []);
 
-  // 🔍 SEARCH FOR POTENTIAL MEMBERS
+  // 🔍 ELITE SEARCH UPDATE: Targeted Operative Discovery
   useEffect(() => {
     const delayDebounce = setTimeout(async () => {
-      if (searchQuery.length > 2) {
+      // Start searching after 2 characters for better performance
+      if (searchQuery.trim().length > 1) { 
         try {
-          // Hits your existing user search endpoint
-          const res = await api.get(`/users/search?q=${searchQuery}&role=Freelancer`);
-          setSearchResults(res.data.filter(u => u._id !== user?._id));
+          // ✅ UPDATED: Points to your new dedicated Search Protocol
+          const res = await api.get(`/search/operatives?q=${searchQuery}`);
+          // Filter out yourself and already selected members
+          const filtered = res.data.filter(u => 
+            u._id !== user?._id && 
+            !formData.members.some(m => m._id === u._id)
+          );
+          setSearchResults(filtered);
         } catch (err) {
-          console.error("Search Error");
+          console.error("Search Protocol Handshake Failed");
         }
+      } else {
+        setSearchResults([]);
       }
-    }, 500);
+    }, 400); // Optimized debounce
     return () => clearTimeout(delayDebounce);
-  }, [searchQuery, user?._id]);
+  }, [searchQuery, user?._id, formData.members]);
 
   const addMember = (selectedUser) => {
+    // ELITE LIMIT: Syndicate strike teams are limited to 5 operatives + Founder
+    if (formData.members.length >= 5) {
+      return toast.error("STRIKE TEAM CAPACITY REACHED: Max 5 Operatives");
+    }
+
     if (formData.members.find(m => m._id === selectedUser._id)) return;
+    
     setFormData({ ...formData, members: [...formData.members, selectedUser] });
-    setSearchQuery('');
-    setSearchResults([]);
+    setSearchQuery(''); // ✅ UI Reset for next search
+    setSearchResults([]); // ✅ UI Reset for next search
+    toast.success(`${selectedUser.name} drafted to syndicate`);
   };
 
   const removeMember = (id) => {
@@ -83,8 +98,8 @@ const MainCollective = () => {
     data.append('name', formData.name);
     data.append('slogan', formData.slogan);
     data.append('description', formData.description);
-    data.append('logo', logoFile); // Matches backend upload.fields
-    data.append('background', bgFile); // Matches backend upload.fields
+    data.append('logo', logoFile); 
+    data.append('background', bgFile); 
     data.append('memberIds', JSON.stringify(formData.members.map(m => m._id)));
 
     try {
@@ -118,7 +133,6 @@ const MainCollective = () => {
           </h1>
         </div>
 
-        {/* ROLE-GATED BUTTON */}
         <div className="relative group">
           <button 
             disabled={!isFreelancer}
@@ -204,7 +218,6 @@ const MainCollective = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-8">
-                {/* LOGO & NAME ROW */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="md:col-span-1">
                     <label className="block text-[9px] font-black uppercase text-amber-500 mb-3">01. Syndicate Logo</label>
@@ -232,14 +245,12 @@ const MainCollective = () => {
                   </div>
                 </div>
 
-                {/* DESCRIPTION */}
                 <div className="space-y-2">
                   <label className="text-[9px] font-black uppercase text-slate-500">Intel Summary (About the Collective)</label>
                   <textarea required rows={4} placeholder="Describe the combined power of your team..." className="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-amber-500 resize-none"
                     onChange={(e) => setFormData({...formData, description: e.target.value})} />
                 </div>
 
-                {/* BACKGROUND SELECTION */}
                 <div className="space-y-2">
                   <label className="text-[9px] font-black uppercase text-slate-500">Portal Visual (Hero Background)</label>
                   <label className="flex items-center gap-4 p-4 bg-slate-950 border border-white/10 rounded-2xl cursor-pointer hover:bg-slate-900 transition-all">
@@ -249,9 +260,15 @@ const MainCollective = () => {
                   </label>
                 </div>
 
-                {/* RECRUITMENT SECTION */}
+                {/* UPDATED RECRUITMENT SECTION WITH ELITE UI SEARCH */}
                 <div className="space-y-4">
-                  <label className="text-[9px] font-black uppercase text-amber-500">02. Strike Team Recruitment</label>
+                  <div className="flex justify-between items-end">
+                    <label className="text-[9px] font-black uppercase text-amber-500">02. Strike Team Recruitment</label>
+                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">
+                      {formData.members.length} / 5 Operatives
+                    </span>
+                  </div>
+                  
                   <div className="relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
                     <input 
@@ -277,12 +294,12 @@ const MainCollective = () => {
                     )}
                   </div>
 
-                  {/* Selected Members Tags */}
                   <div className="flex flex-wrap gap-3">
                     {formData.members.map(m => (
-                      <div key={m._id} className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded-xl">
+                      <div key={m._id} className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded-xl group transition-all hover:bg-amber-500/20">
+                        <img src={m.identityImage} className="w-4 h-4 rounded-md object-cover" alt="" />
                         <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">{m.name}</span>
-                        <button type="button" onClick={() => removeMember(m._id)} className="text-amber-500 hover:text-white"><X size={12}/></button>
+                        <button type="button" onClick={() => removeMember(m._id)} className="text-amber-500 hover:text-white transition-colors"><X size={12}/></button>
                       </div>
                     ))}
                     {formData.members.length === 0 && (
