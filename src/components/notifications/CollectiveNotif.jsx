@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { XCircle, Users, Clock, ShieldCheck, Zap } from 'lucide-react';
 import api from '../../utils/api';
 import { toast } from 'react-hot-toast';
-import { getImageUrl } from '../../../config/config';
-
+import { getImageUrl } from '../../config/config'
 const CollectiveNotif = ({ notification, onActionComplete }) => {
   const [loading, setLoading] = useState(false);
   
