@@ -8,6 +8,7 @@ import {
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../utils/api';
 import { toast } from 'react-hot-toast';
+import { getImageUrl } from '../../../config/config';
 
 const MainCollective = () => {
   const { user } = useAuth();
@@ -35,10 +36,13 @@ const MainCollective = () => {
   useEffect(() => {
     const fetchCollectives = async () => {
       try {
+        setFetching(true);
         const res = await api.get('/collectives');
-        setCollectives(res.data);
+        // ✅ FIX: Backend returns { data: [...] }
+        setCollectives(res.data.data || []);
       } catch (err) {
-        console.error("Discovery Error");
+        console.error("Discovery Error:", err);
+        toast.error("Failed to sync with Syndicate Grid");
       } finally {
         setFetching(false);
       }
@@ -49,13 +53,12 @@ const MainCollective = () => {
   // 🔍 ELITE SEARCH UPDATE: Targeted Operative Discovery
   useEffect(() => {
     const delayDebounce = setTimeout(async () => {
-      // Start searching after 2 characters for better performance
       if (searchQuery.trim().length > 1) { 
         try {
-          // ✅ UPDATED: Points to your new dedicated Search Protocol
           const res = await api.get(`/search/operatives?q=${searchQuery}`);
-          // Filter out yourself and already selected members
-          const filtered = res.data.filter(u => 
+          const data = res.data.data || res.data; // Handles both wrapped and unwrapped arrays
+          
+          const filtered = data.filter(u => 
             u._id !== user?._id && 
             !formData.members.some(m => m._id === u._id)
           );
@@ -66,21 +69,19 @@ const MainCollective = () => {
       } else {
         setSearchResults([]);
       }
-    }, 400); // Optimized debounce
+    }, 400); 
     return () => clearTimeout(delayDebounce);
   }, [searchQuery, user?._id, formData.members]);
 
   const addMember = (selectedUser) => {
-    // ELITE LIMIT: Syndicate strike teams are limited to 5 operatives + Founder
     if (formData.members.length >= 5) {
       return toast.error("STRIKE TEAM CAPACITY REACHED: Max 5 Operatives");
     }
-
     if (formData.members.find(m => m._id === selectedUser._id)) return;
     
     setFormData({ ...formData, members: [...formData.members, selectedUser] });
-    setSearchQuery(''); // ✅ UI Reset for next search
-    setSearchResults([]); // ✅ UI Reset for next search
+    setSearchQuery(''); 
+    setSearchResults([]); 
     toast.success(`${selectedUser.name} drafted to syndicate`);
   };
 
@@ -106,7 +107,10 @@ const MainCollective = () => {
       await api.post('/collectives/initiate', data);
       toast.success("Collective Initiated! Recruitment notifications dispatched.");
       
-      // Reset State
+      // Refresh list and reset modal
+      const refresh = await api.get('/collectives');
+      setCollectives(refresh.data.data || []);
+      
       setIsModalOpen(false);
       setFormData({ name: '', slogan: '', description: '', members: [] });
       setLogoFile(null);
@@ -166,13 +170,13 @@ const MainCollective = () => {
             {collectives.map((col) => (
               <div key={col._id} className="group relative bg-slate-900 border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-amber-500/30 transition-all duration-500">
                 <div className="h-48 overflow-hidden">
-                  <img src={col.heroBackground} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" />
+                  <img src={getImageUrl(col.heroBackground)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" />
                 </div>
                 <div className="p-8">
                   <div className="flex justify-between items-start mb-4">
-                    <img src={col.logo} className="w-16 h-16 rounded-2xl border-2 border-slate-950 -mt-16 bg-slate-900" alt="" />
+                    <img src={getImageUrl(col.logo)} className="w-16 h-16 rounded-2xl border-2 border-slate-950 -mt-16 bg-slate-900 object-cover" alt="" />
                     <div className="bg-amber-500/10 text-amber-500 text-[8px] font-black px-3 py-1 rounded-full border border-amber-500/20 uppercase tracking-widest">
-                      Rank #{col.rating}
+                      Rank #{col.rating || 0}
                     </div>
                   </div>
                   <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">{col.name}</h3>
@@ -260,7 +264,6 @@ const MainCollective = () => {
                   </label>
                 </div>
 
-                {/* UPDATED RECRUITMENT SECTION WITH ELITE UI SEARCH */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-end">
                     <label className="text-[9px] font-black uppercase text-amber-500">02. Strike Team Recruitment</label>
@@ -282,7 +285,7 @@ const MainCollective = () => {
                       <div className="absolute top-full left-0 w-full bg-slate-800 border border-white/10 mt-2 rounded-2xl overflow-hidden z-[160] shadow-2xl max-h-60 overflow-y-auto">
                         {searchResults.map(u => (
                           <button key={u._id} type="button" onClick={() => addMember(u)} className="w-full flex items-center gap-4 p-4 hover:bg-white/5 transition-all border-b border-white/5 last:border-0">
-                            <img src={u.identityImage} className="w-10 h-10 rounded-lg object-cover" alt="" />
+                            <img src={getImageUrl(u.identityImage)} className="w-10 h-10 rounded-lg object-cover" alt="" />
                             <div className="text-left">
                               <p className="text-xs font-bold text-white uppercase">{u.name}</p>
                               <p className="text-[8px] text-slate-500 font-black uppercase tracking-widest">{u.speciality || 'Operative'}</p>
@@ -297,7 +300,7 @@ const MainCollective = () => {
                   <div className="flex flex-wrap gap-3">
                     {formData.members.map(m => (
                       <div key={m._id} className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded-xl group transition-all hover:bg-amber-500/20">
-                        <img src={m.identityImage} className="w-4 h-4 rounded-md object-cover" alt="" />
+                        <img src={getImageUrl(m.identityImage)} className="w-4 h-4 rounded-md object-cover" alt="" />
                         <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">{m.name}</span>
                         <button type="button" onClick={() => removeMember(m._id)} className="text-amber-500 hover:text-white transition-colors"><X size={12}/></button>
                       </div>
@@ -310,6 +313,7 @@ const MainCollective = () => {
 
                 <button 
                   disabled={loading}
+                  type="submit"
                   className="w-full py-6 bg-gradient-to-r from-amber-600 to-amber-500 text-black font-black uppercase tracking-[0.4em] text-xs rounded-[2rem] hover:scale-[1.02] active:scale-95 transition-all shadow-xl disabled:opacity-50"
                 >
                   {loading ? (
