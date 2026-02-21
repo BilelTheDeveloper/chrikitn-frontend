@@ -6,18 +6,38 @@ import { getImageUrl } from '../../../config/config';
 
 const CollectiveNotif = ({ notification, onActionComplete }) => {
   const [loading, setLoading] = useState(false);
+  // Destructure with fallbacks to prevent "undefined" crashes
   const { metadata, ctaStatus, _id, sender } = notification;
 
   const handleAccept = async () => {
+    // Safety check: ensure we have the collective ID before firing
+    if (!metadata?.collectiveId) {
+      return toast.error("CRITICAL_ERROR: Syndicate ID missing from intel.");
+    }
+
     setLoading(true);
     try {
-      // Points to: PUT /api/collectives/accept/:id
+      /**
+       * ⚡ THE HANDSHAKE
+       * Backend: router.put('/accept/:id', auth, collectiveController.acceptInvitation);
+       * We pass notificationId in the body so the backend can mark it as 'Completed'
+       */
       await api.put(`/collectives/accept/${metadata.collectiveId}`, {
         notificationId: _id
       });
-      toast.success("SYNDICATE HANDSHAKE CONFIRMED");
+
+      toast.success("SYNDICATE HANDSHAKE CONFIRMED", {
+        style: {
+          background: '#10b981',
+          color: '#fff',
+          fontWeight: 'bold'
+        }
+      });
+
+      // Trigger refresh in parent component to update UI state
       if (onActionComplete) onActionComplete(); 
     } catch (err) {
+      console.error("HANDSHAKE_FAILURE:", err);
       toast.error(err.response?.data?.msg || "Handshake Failed");
     } finally {
       setLoading(false);
@@ -25,7 +45,7 @@ const CollectiveNotif = ({ notification, onActionComplete }) => {
   };
 
   return (
-    <div className="group relative bg-slate-900/80 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-1 transition-all duration-500 hover:border-amber-500/40 hover:shadow-[0_0_40px_rgba(245,158,11,0.1)]">
+    <div className="group relative bg-slate-900/80 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-1 transition-all duration-500 hover:border-amber-500/40 hover:shadow-[0_0_40px_rgba(245,158,11,0.1)] mb-4">
       {/* GLOW DECORATOR */}
       <div className="absolute -top-px left-10 right-10 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
@@ -47,7 +67,7 @@ const CollectiveNotif = ({ notification, onActionComplete }) => {
                 </div>
               )}
             </div>
-            <div className="absolute -bottom-2 -right-2 p-1.5 bg-amber-500 rounded-lg text-black">
+            <div className="absolute -bottom-2 -right-2 p-1.5 bg-amber-500 rounded-lg text-black shadow-lg">
               <Zap size={12} fill="currentColor" />
             </div>
           </div>
@@ -82,7 +102,7 @@ const CollectiveNotif = ({ notification, onActionComplete }) => {
                 <button
                   disabled={loading}
                   onClick={handleAccept}
-                  className="relative group/btn overflow-hidden flex items-center justify-center gap-3 px-8 py-4 bg-white hover:bg-amber-500 text-black rounded-2xl transition-all duration-300 disabled:opacity-50 active:scale-95"
+                  className="relative group/btn overflow-hidden flex items-center justify-center gap-3 px-8 py-4 bg-white hover:bg-amber-500 text-black rounded-2xl transition-all duration-300 disabled:opacity-50 active:scale-95 shadow-xl"
                 >
                   {loading ? (
                     <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
