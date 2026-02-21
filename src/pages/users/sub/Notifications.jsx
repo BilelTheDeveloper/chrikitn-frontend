@@ -20,17 +20,18 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Fetch Transmissions (Pending Missions & Invites)
+  // 1. Fetch Transmissions (Now unified: Missions & Collective Invites)
   const fetchSignals = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      // ✅ UPDATED: Uses API_BASE_URL
-      const res = await axios.get(`${API_BASE_URL}/requests/incoming`, {
+      // ✅ UPDATED: Points to the new centralized notification route
+      const res = await axios.get(`${API_BASE_URL}/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
+      // Our new controller returns data inside a 'data' array
       setNotifications(res.data.data);
       setLoading(false);
     } catch (err) {
@@ -48,7 +49,7 @@ const Notifications = () => {
     try {
       const token = localStorage.getItem('token');
       
-      // ✅ UPDATED: Uses API_BASE_URL
+      // ✅ MISSION PROTOCOL: Still uses the requests endpoint for mission-specific logic
       await axios.patch(`${API_BASE_URL}/requests/${id}/respond`, 
         { action: action }, 
         { headers: { Authorization: `Bearer ${token}` } }
@@ -154,15 +155,17 @@ const Notifications = () => {
                       <div>
                         <p className="text-[9px] font-black text-amber-500/50 uppercase mb-1">Primary Objective</p>
                         <p className="text-xs text-slate-200 leading-relaxed font-medium">
-                          {item.globalMissionObjective}
+                          {item.globalMissionObjective || item.message}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-[9px] font-black text-amber-500/50 uppercase mb-1">Operational Details</p>
-                        <p className="text-[11px] text-slate-400 italic">
-                          {item.missionDetails}
-                        </p>
-                      </div>
+                      {item.missionDetails && (
+                        <div>
+                          <p className="text-[9px] font-black text-amber-500/50 uppercase mb-1">Operational Details</p>
+                          <p className="text-[11px] text-slate-400 italic">
+                            {item.missionDetails}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* DECISION BUTTONS */}
