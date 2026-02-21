@@ -20,22 +20,25 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Fetch Transmissions (Now unified: Missions & Collective Invites)
+  // 1. Fetch Transmissions
   const fetchSignals = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      // ✅ UPDATED: Points to the new centralized notification route
       const res = await axios.get(`${API_BASE_URL}/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      // Our new controller returns data inside a 'data' array
-      setNotifications(res.data.data);
+      // ✅ SAFETY FIX: Check both res.data.data AND res.data
+      const incomingData = res.data.data || res.data || [];
+      console.log("📡 SIGNAL SCAN COMPLETE:", incomingData);
+      
+      setNotifications(incomingData);
       setLoading(false);
     } catch (err) {
       console.error("Signal Interruption:", err);
+      setNotifications([]); // Prevent breaking map on error
       setLoading(false);
     }
   };
@@ -49,14 +52,14 @@ const Notifications = () => {
     try {
       const token = localStorage.getItem('token');
       
-      // ✅ MISSION PROTOCOL: Still uses the requests endpoint for mission-specific logic
       await axios.patch(`${API_BASE_URL}/requests/${id}/respond`, 
         { action: action }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
       setNotifications(prev => prev.filter(n => n._id !== id));
-      alert(`PROTOCOL ${action.toUpperCase()}ED: Signal processed.`);
+      // Replace with toast if available for better style
+      console.log(`PROTOCOL ${action.toUpperCase()}ED: Signal processed.`);
     } catch (err) {
       console.error("Action Error:", err.response?.data);
       alert(err.response?.data?.msg || "Action failed.");
@@ -90,8 +93,10 @@ const Notifications = () => {
         <AnimatePresence mode='popLayout'>
           {notifications.length > 0 ? (
             notifications.map((item) => {
-              // ✅ NEW: CHECK FOR COLLECTIVE TYPE
-              if (item.type === 'COLLECTIVE_INVITE') {
+              // ✅ NORMALIZED TYPE CHECK: Prevents case-sensitivity issues
+              const isCollective = item.type?.toUpperCase() === 'COLLECTIVE_INVITE';
+
+              if (isCollective) {
                 return (
                   <motion.div
                     key={item._id}
@@ -118,11 +123,9 @@ const Notifications = () => {
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="relative group p-6 rounded-[2rem] border border-amber-500/30 bg-slate-900/60 shadow-[0_0_20px_rgba(245,158,11,0.05)] transition-all duration-300"
                 >
-                  {/* Status Indicator */}
                   <div className="absolute top-0 left-0 h-full w-1 bg-amber-500 rounded-l-2xl" />
 
                   <div className="flex flex-col gap-4">
-                    {/* Header Info */}
                     <div className="flex justify-between items-start">
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20 overflow-hidden">
@@ -138,7 +141,7 @@ const Notifications = () => {
                         </div>
                         <div>
                           <h3 className="text-sm font-black uppercase tracking-tight text-white">
-                            Briefing: {item.relatedPost?.title || "Operational Intel"}
+                            Briefing: {item.relatedPost?.title || item.title || "Operational Intel"}
                           </h3>
                           <p className="text-[10px] text-amber-400 font-bold uppercase tracking-widest">
                             From Operative: {item.sender?.name || "Unknown"}
@@ -150,7 +153,6 @@ const Notifications = () => {
                       </span>
                     </div>
 
-                    {/* Objective Details */}
                     <div className="space-y-3 bg-black/30 p-4 rounded-xl border border-white/5">
                       <div>
                         <p className="text-[9px] font-black text-amber-500/50 uppercase mb-1">Primary Objective</p>
@@ -158,17 +160,8 @@ const Notifications = () => {
                           {item.globalMissionObjective || item.message}
                         </p>
                       </div>
-                      {item.missionDetails && (
-                        <div>
-                          <p className="text-[9px] font-black text-amber-500/50 uppercase mb-1">Operational Details</p>
-                          <p className="text-[11px] text-slate-400 italic">
-                            {item.missionDetails}
-                          </p>
-                        </div>
-                      )}
                     </div>
 
-                    {/* DECISION BUTTONS */}
                     <div className="flex gap-3 pt-2">
                       <button 
                         onClick={() => handleDecision(item._id, 'accept')}

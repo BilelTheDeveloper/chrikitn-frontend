@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
-import { CheckCircle2, XCircle, Users, Clock, ShieldCheck, Zap } from 'lucide-react';
+import { XCircle, Users, Clock, ShieldCheck, Zap } from 'lucide-react';
 import api from '../../utils/api';
 import { toast } from 'react-hot-toast';
 import { getImageUrl } from '../../../config/config';
 
 const CollectiveNotif = ({ notification, onActionComplete }) => {
   const [loading, setLoading] = useState(false);
-  // Destructure with fallbacks to prevent "undefined" crashes
-  const { metadata, ctaStatus, _id, sender } = notification;
+  
+  // Destructure with safety
+  const { metadata, ctaStatus, _id, sender } = notification || {};
 
   const handleAccept = async () => {
-    // Safety check: ensure we have the collective ID before firing
+    // 1. Ensure the Collective ID exists in metadata
     if (!metadata?.collectiveId) {
-      return toast.error("CRITICAL_ERROR: Syndicate ID missing from intel.");
+      console.error("Missing Metadata:", metadata);
+      return toast.error("INTEL ERROR: Syndicate ID missing.");
     }
 
     setLoading(true);
     try {
       /**
        * ⚡ THE HANDSHAKE
-       * Backend: router.put('/accept/:id', auth, collectiveController.acceptInvitation);
-       * We pass notificationId in the body so the backend can mark it as 'Completed'
+       * Path: /api/collectives/accept/:id
+       * Body: notificationId (to mark the ctaStatus as 'Completed')
        */
       await api.put(`/collectives/accept/${metadata.collectiveId}`, {
         notificationId: _id
@@ -28,13 +30,18 @@ const CollectiveNotif = ({ notification, onActionComplete }) => {
 
       toast.success("SYNDICATE HANDSHAKE CONFIRMED", {
         style: {
-          background: '#10b981',
-          color: '#fff',
-          fontWeight: 'bold'
-        }
+          background: '#0f172a',
+          color: '#f59e0b',
+          border: '1px solid rgba(245,158,11,0.2)',
+          fontWeight: '900',
+          textTransform: 'uppercase',
+          fontSize: '10px',
+          letterSpacing: '0.1em'
+        },
+        icon: <ShieldCheck className="text-amber-500" size={20} />
       });
 
-      // Trigger refresh in parent component to update UI state
+      // 2. Execute parent refresh protocol
       if (onActionComplete) onActionComplete(); 
     } catch (err) {
       console.error("HANDSHAKE_FAILURE:", err);
@@ -53,8 +60,8 @@ const CollectiveNotif = ({ notification, onActionComplete }) => {
         <div className="flex flex-col md:flex-row items-start gap-6">
           
           {/* LEFT: SENDER IDENTITY */}
-          <div className="relative">
-            <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-slate-800 bg-slate-950 group-hover:border-amber-500/50 transition-colors duration-500">
+          <div className="relative shrink-0">
+            <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-slate-800 bg-slate-950 group-hover:border-amber-500/50 transition-all duration-500 group-hover:scale-105">
               {sender?.identityImage ? (
                 <img 
                   src={getImageUrl(sender.identityImage)} 
@@ -67,7 +74,7 @@ const CollectiveNotif = ({ notification, onActionComplete }) => {
                 </div>
               )}
             </div>
-            <div className="absolute -bottom-2 -right-2 p-1.5 bg-amber-500 rounded-lg text-black shadow-lg">
+            <div className="absolute -bottom-2 -right-2 p-1.5 bg-amber-500 rounded-lg text-black shadow-[0_0_15px_rgba(245,158,11,0.5)]">
               <Zap size={12} fill="currentColor" />
             </div>
           </div>
@@ -77,26 +84,26 @@ const CollectiveNotif = ({ notification, onActionComplete }) => {
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="space-y-1">
                 <h4 className="text-lg font-black uppercase italic text-white tracking-tighter leading-none">
-                  {notification.title}
+                  {notification?.title || "Syndicate Intel"}
                 </h4>
                 <div className="flex items-center gap-2">
                   <span className="text-[9px] font-black text-amber-500 uppercase tracking-[0.2em] bg-amber-500/10 px-2 py-0.5 rounded">
                     Syndicate Invite
                   </span>
                   <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                    <Clock size={10} /> {new Date(notification.createdAt).toLocaleDateString()}
+                    <Clock size={10} /> {notification?.createdAt ? new Date(notification.createdAt).toLocaleDateString() : 'RECENT'}
                   </span>
                 </div>
               </div>
             </div>
 
             <p className="text-xs text-slate-400 font-medium leading-relaxed max-w-lg">
-              {notification.message}
+              {notification?.message || "Incoming recruitment signal detected."}
             </p>
           </div>
 
           {/* RIGHT: ACTION ENGINE */}
-          <div className="w-full md:w-auto self-center">
+          <div className="w-full md:w-auto self-center shrink-0">
             {ctaStatus === 'Pending' ? (
               <div className="flex items-center gap-2">
                 <button
