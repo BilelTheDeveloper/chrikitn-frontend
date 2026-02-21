@@ -12,7 +12,8 @@ import {
   X,
   LogOut,
   Target,
-  Zap
+  Zap,
+  Users // Added for Collectives
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -80,9 +81,11 @@ const Main = () => {
       ? `/main/profile/${user.id}` 
       : '/main/profile';
 
+  // ✅ UPDATED NAV ITEMS: Added Collectives
   const navItems = [
     { name: 'Feed', path: '/main', icon: <LayoutGrid size={18} /> },
     { name: 'VipFeed', path: '/main/vip', icon: <Flame size={18} /> },
+    { name: 'Collectives', path: '/main/collective', icon: <Users size={18} /> },
     { name: 'Chat', path: '/main/Connections', icon: <Inbox size={18} /> }
   ];
 
@@ -118,7 +121,7 @@ const Main = () => {
             <Link
               key={item.name}
               to={item.path}
-              className={`relative px-8 py-2.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${
+              className={`relative px-6 py-2.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-2 ${
                 isActive(item.path) ? 'text-white' : 'text-slate-500 hover:text-slate-300'
               }`}
             >
@@ -284,14 +287,14 @@ const Main = () => {
             );
           })}
           <Link to={myProfilePath} className={`p-1 transition-all duration-300 ${isActive('/main/profile') ? 'scale-110' : ''}`}>
-             <div className={`w-8 h-8 rounded-full overflow-hidden border-2 ${isActive('/main/profile') ? 'border-blue-500' : 'border-slate-700'}`}>
+              <div className={`w-8 h-8 rounded-full overflow-hidden border-2 ${isActive('/main/profile') ? 'border-blue-500' : 'border-slate-700'}`}>
                 <img 
                   src={getImageUrl(user?.identityImage)} 
                   className="w-full h-full object-cover" 
                   onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=U' }}
                   alt=""
                 />
-             </div>
+              </div>
           </Link>
         </div>
       </div>

@@ -31,6 +31,7 @@ import AdminAccess from './pages/admin/AdminAccess';
 import Main from './pages/users/Mainn';
 import UserFeed from './pages/users/sub/UserFeed';
 import VipFeed from './pages/users/sub/VipFeed';
+import MainCollective from './pages/users/collective/MainCollective'; // ✅ NEW: COLLECTIVE HUB
 
 import Notifications from './pages/users/sub/Notifications'; 
 import Profile from './pages/users/Profile'; 
@@ -105,6 +106,7 @@ const AppContent = () => {
                   path="vip" 
                   element={hasVipAccess ? <VipFeed /> : <VipAccessDenied />} 
                 />
+                <Route path="collective" element={<MainCollective />} /> {/* ✅ NEW: COLLECTIVE PAGE REGISTERED */}
                 <Route path="apply-vip" element={<VipApplicationForm />} /> 
                 <Route path="connections" element={<Connections />} />
                 <Route path="chat/:connectionId" element={<ChatRoom />} />
