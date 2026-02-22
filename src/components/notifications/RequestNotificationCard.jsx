@@ -10,7 +10,8 @@ const RequestNotificationCard = ({ notification, onRespond }) => {
     const { metadata, sender, message, createdAt } = notification;
 
     // ✅ EXTRACT REQUEST ID FROM METADATA
-    const requestId = metadata?.requestId;
+    // We check both keys to ensure the Handshake Protocol never fails.
+    const requestId = metadata?.requestId || metadata?.missionId;
 
     return (
         <motion.div 
