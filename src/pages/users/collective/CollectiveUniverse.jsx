@@ -10,7 +10,7 @@ import {
 const getImageUrl = (path) => {
   if (!path) return "https://via.placeholder.com/800";
   if (path.startsWith('http')) return path;
-  return `http://localhost:5000${path}`; // Adjust port to match your backend
+  return `http://localhost:5000${path}`; 
 };
 
 const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
@@ -22,40 +22,66 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
         logo: getImageUrl(data.logo),
         description: data.description || "We are a multidisciplinary elite force specialized in digital transformation.",
         
-        // ✅ Mapping the dynamic Services from your Create form
         services: data.services?.length > 0 ? data.services : [
             { title: "NEURAL INTERFACE", description: "High-end digital experiences designed for the next generation of the web." },
             { title: "CYBER BRANDING", description: "Establishing dominant visual identities in the global digital landscape." },
             { title: "QUANTUM DEV", description: "Scalable architecture built with precision and futuristic logic." }
         ],
 
-        members: data.members?.length > 0 ? data.members.map(m => ({
-            id: m._id,
-            name: m.name || m.username,
-            role: m.specialty || "Operative",
-            badge: m.role === 'admin' ? "Prime" : "Elite",
-            img: getImageUrl(m.profilePicture || m.img)
-        })) : [
-            { id: 1, name: "Neural Operative", role: "Scanning...", badge: "Void", img: "https://i.pravatar.cc/150?u=1" }
-        ],
+        // ✅ UPDATED TEAM LOGIC: Combine Owner + Members
+        members: (() => {
+            const list = [];
+            
+            // 1. Add Owner first
+            if (data.owner) {
+                list.push({
+                    id: data.owner._id,
+                    name: data.owner.name,
+                    role: data.owner.speciality || "Founding Member",
+                    badge: "Prime",
+                    img: getImageUrl(data.owner.biometricImage),
+                    portfolio: data.owner.portfolioUrl || "#"
+                });
+            }
 
-        lastWorks: data.projects?.length > 0 ? data.projects.map(p => ({
-            url: getImageUrl(p.image || p.url),
-            title: p.title
+            // 2. Add Accepted Members
+            if (data.members && data.members.length > 0) {
+                data.members.forEach(m => {
+                    if (m.user) {
+                        list.push({
+                            id: m.user._id,
+                            name: m.user.name,
+                            role: m.user.speciality || "Operative",
+                            badge: m.status === 'Accepted' ? "Elite" : "Pending",
+                            img: getImageUrl(m.user.biometricImage),
+                            portfolio: m.user.portfolioUrl || "#"
+                        });
+                    }
+                });
+            }
+
+            // Fallback if empty
+            return list.length > 0 ? list : [
+                { id: 1, name: "Neural Operative", role: "Scanning...", badge: "Void", img: "https://i.pravatar.cc/150?u=1", portfolio: "#" }
+            ];
+        })(),
+
+        lastWorks: data.lastWorks?.length > 0 ? data.lastWorks.map(p => ({
+            url: getImageUrl(p.image),
+            title: p.title,
+            link: p.link || "#"
         })) : [
-            { url: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
-            { url: "https://images.unsplash.com/photo-1633167606207-d840b5070fc2?auto=format&fit=crop&q=80" },
-            { url: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80" }
+            { url: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?q=80&w=687&auto=format&fit=crop" },
+            { url: "https://images.unsplash.com/photo-1633167606207-d840b5070fc2?auto=format&fit=crop" }
         ]
     };
 
     return (
         <div className="relative min-h-screen bg-[#020617] text-white selection:bg-amber-500/30 overflow-x-hidden font-sans">
             
-            {/* --- STATIC NOISE OVERLAY --- */}
             <div className="fixed inset-0 z-[100] pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-            {/* --- 1. HERO SECTION: THE MONOLITH --- */}
+            {/* --- 1. HERO SECTION --- */}
             <section className="relative h-[110vh] w-full flex items-center justify-center overflow-hidden">
                 <motion.div 
                     initial={{ scale: 1.2, opacity: 0 }}
@@ -129,12 +155,12 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
 
             <div className="container mx-auto px-6 md:px-12 space-y-60 py-40">
                 
-                {/* --- 2. VISION CONTENT: THE DNA --- */}
+                {/* --- 2. ABOUT US --- */}
                 <section className="grid lg:grid-cols-2 gap-24 items-center">
                     <div className="order-2 lg:order-1">
                         <div className="relative rounded-[4rem] overflow-hidden group border border-white/5">
                             <div className="absolute inset-0 bg-amber-500/20 mix-blend-overlay group-hover:opacity-0 transition-opacity duration-700" />
-                            <img src={displayData.lastWorks[0].url} className="w-full aspect-[4/5] object-cover scale-110 group-hover:scale-100 transition-transform duration-1000" alt="Process" />
+                            <img src={displayData.lastWorks[0]?.url} className="w-full aspect-[4/5] object-cover scale-110 group-hover:scale-100 transition-transform duration-1000" alt="Process" />
                             <div className="absolute bottom-8 left-8 right-8 p-8 backdrop-blur-2xl bg-black/40 border border-white/10 rounded-[2rem]">
                                 <div className="flex justify-between items-center">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-amber-500">Operation_Summary</p>
@@ -176,7 +202,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                     </div>
                 </section>
 
-                {/* --- ✅ NEW: SERVICE BLUEPRINT SECTION (WYSIWYG Result) --- */}
+                {/* --- 3. SERVICES --- */}
                 <section>
                     <div className="mb-24">
                         <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter">Operational_Services</h2>
@@ -213,12 +239,12 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                     </div>
                 </section>
 
-                {/* --- 3. THE COUNCIL: OPERATIVES --- */}
+                {/* --- 4. THE TEAM (FIXED: OWNER + MEMBERS) --- */}
                 <section>
                     <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
                         <div>
                             <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter">Neural_Operatives</h2>
-                            <p className="text-amber-500 text-xs font-black uppercase tracking-[0.4em] mt-4">Verified High-Value Assets</p>
+                            <p className="text-amber-500 text-xs font-black uppercase tracking-[0.4em] mt-4">Unified Strategic Syndicate</p>
                         </div>
                     </div>
 
@@ -242,20 +268,20 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                                         <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest">{member.role}</p>
                                     </div>
 
-                                    <div className="mt-10 pt-10 border-t border-white/5 flex justify-between items-center">
+                                    <a href={member.portfolio} target="_blank" rel="noopener noreferrer" className="mt-10 pt-10 border-t border-white/5 flex justify-between items-center group/link">
                                         <div className="flex items-center gap-2">
                                             <Award size={14} className="text-slate-500" />
                                             <span className="text-[9px] font-black text-slate-500 uppercase">{member.badge}</span>
                                         </div>
-                                        <ArrowRight size={20} className="text-white/20 group-hover:text-amber-500 transition-colors" />
-                                    </div>
+                                        <ArrowRight size={20} className="text-white/20 group-hover:text-amber-500 group-hover/link:translate-x-2 transition-all" />
+                                    </a>
                                 </div>
                             </motion.div>
                         ))}
                     </div>
                 </section>
 
-                {/* --- 4. THE VAULT: MISSION LOGS --- */}
+                {/* --- 5. MISSION ARCHIVE --- */}
                 <section className="pb-40">
                     <div className="flex items-center gap-6 mb-16">
                         <h2 className="text-5xl font-black uppercase italic tracking-tighter">Mission_Archive</h2>
@@ -264,7 +290,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {displayData.lastWorks.map((work, i) => (
-                            <div key={i} className="group relative aspect-[4/3] rounded-[3rem] overflow-hidden border border-white/10 cursor-crosshair">
+                            <a key={i} href={work.link} target="_blank" rel="noopener noreferrer" className="group relative aspect-[4/3] rounded-[3rem] overflow-hidden border border-white/10 cursor-crosshair">
                                 <img src={work.url} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 brightness-75 group-hover:brightness-100" alt="Work" />
                                 
                                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 backdrop-blur-[4px] flex flex-col items-center justify-center">
@@ -273,13 +299,13 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                                     </div>
                                     <p className="mt-4 text-[10px] font-black uppercase tracking-[0.3em] text-amber-500">Decrypt_Project</p>
                                 </div>
-                            </div>
+                            </a>
                         ))}
                     </div>
                 </section>
             </div>
 
-            {/* --- FOOTER: THE SIGNAL --- */}
+            {/* --- FOOTER --- */}
             <footer className="relative border-t border-white/5 py-24 bg-black/60 backdrop-blur-2xl overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
         
@@ -312,10 +338,6 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                         <p className="text-[9px] font-black uppercase tracking-[0.6em] text-white/30">
                             Authorized Access Only <span className="text-amber-500/50 mx-2">|</span> © 2026 {displayData.name}
                         </p>
-                        <div className="flex justify-center gap-4">
-                            <span className="text-[7px] font-bold text-slate-700 uppercase tracking-widest cursor-help hover:text-slate-500">Security_Protocol_v4.0</span>
-                            <span className="text-[7px] font-bold text-slate-700 uppercase tracking-widest cursor-help hover:text-slate-500">Encrypted_Endpoint</span>
-                        </div>
                     </div>
                 </div>
             </footer>
