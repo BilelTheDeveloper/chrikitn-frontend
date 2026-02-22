@@ -145,8 +145,8 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                             <div className="h-px w-20 bg-white/10" />
                             <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Syndicate_ID</span>
                         </div>
-                        <h2 className={`text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-none ${displayData.name.split(' ')[0] === "Elite" ? "text-white" : "text-amber-500"}`}>
-                            
+                        <h2 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-none">
+                            {"About " ||displayData.name.split(' ').slice(1).join(' ') }
                         </h2>
                         <p className="text-slate-400 text-xl leading-relaxed font-light">
                             {displayData.description}
