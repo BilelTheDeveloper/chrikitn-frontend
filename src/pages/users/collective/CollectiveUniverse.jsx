@@ -135,7 +135,6 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                                     <p className="text-[10px] font-black uppercase tracking-widest text-amber-500">Operation_Summary</p>
                                     <Target size={16} className="text-amber-500" />
                                 </div>
-                                <h3 className="text-2xl font-black uppercase italic mt-2">Precision_Execution</h3>
                             </div>
                         </div>
                     </div>
@@ -146,8 +145,8 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                             <div className="h-px w-20 bg-white/10" />
                             <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Syndicate_ID</span>
                         </div>
-                        <h2 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-none">
-                            Elite <span className="text-transparent border-t-2 border-b-2 border-white px-2">Collective</span> DNA
+                        <h2 className={`text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-none ${displayData.name.split(' ')[0] === "Elite" ? "text-white" : "text-amber-500"}`}>
+                            
                         </h2>
                         <p className="text-slate-400 text-xl leading-relaxed font-light">
                             {displayData.description}
