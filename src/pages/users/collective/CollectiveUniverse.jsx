@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Instagram, Globe, Linkedin, Twitter, ShieldCheck } from 'lucide-react';
+import { Instagram, Linkedin, Twitter, ShieldCheck } from 'lucide-react';
 import { 
   ExternalLink, Rocket, Fingerprint, Award, 
   Globe, Shield, Cpu, Zap, ArrowRight, Target
@@ -240,18 +240,18 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
 
             {/* --- FOOTER: THE SIGNAL --- */}
             <footer className="relative border-t border-white/5 py-24 bg-black/60 backdrop-blur-2xl overflow-hidden">
-    {/* Subtle Ambient Glow */}
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
+            {/* Subtle Ambient Glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
     
-    <div className="container mx-auto px-6 flex flex-col items-center">
-        {/* Social Matrix */}
-        <div className="flex justify-center gap-8 mb-12">
-            {[
-                { icon: <Instagram size={18} />, label: "Instagram" },
-                { icon: <Twitter size={18} />, label: "Twitter" },
-                { icon: <Linkedin size={18} />, label: "LinkedIn" },
-                { icon: <Globe size={18} />, label: "Network" }
-            ].map((social, i) => (
+            <div className="container mx-auto px-6 flex flex-col items-center">
+                {/* Social Matrix */}
+                    <div className="flex justify-center gap-8 mb-12">
+                    {[
+                    { icon: <Instagram size={18} />, label: "Instagram" },
+                    { icon: <Twitter size={18} />, label: "Twitter" },
+                    { icon: <Linkedin size={18} />, label: "LinkedIn" },
+                    { icon: <Globe size={18} />, label: "Network" }
+                ].map((social, i) => (
                 <a 
                     key={i}
                     href="#" 
@@ -259,29 +259,29 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                 >
                     {social.icon}
                 </a>
-            ))}
-        </div>
+                ))}
+            </div>
 
-        {/* Verification Badge */}
-        <div className="flex items-center gap-3 px-6 py-2 bg-emerald-500/5 border border-emerald-500/20 rounded-full mb-8">
-            <ShieldCheck size={14} className="text-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">
-                Verified by <span className="text-white">Chriki Tn</span>
-            </span>
-        </div>
+            {/* Verification Badge */}
+            <div className="flex items-center gap-3 px-6 py-2 bg-emerald-500/5 border border-emerald-500/20 rounded-full mb-8">
+                <ShieldCheck size={14} className="text-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">
+                  Verified by <span className="text-white">Chriki Tn</span>
+                </span>
+            </div>
 
-        {/* Copyright & Legal */}
-        <div className="space-y-4 text-center">
+                {/* Copyright & Legal */}
+            <div className="space-y-4 text-center">
             <p className="text-[9px] font-black uppercase tracking-[0.6em] text-white/30">
                 Authorized Access Only <span className="text-amber-500/50 mx-2">|</span> © 2026 {displayData.name}
             </p>
-            <div className="flex justify-center gap-4">
-                <span className="text-[7px] font-bold text-slate-700 uppercase tracking-widest cursor-help hover:text-slate-500">Security_Protocol_v4.0</span>
-                <span className="text-[7px] font-bold text-slate-700 uppercase tracking-widest cursor-help hover:text-slate-500">Encrypted_Endpoint</span>
+                <div className="flex justify-center gap-4">
+                    <span className="text-[7px] font-bold text-slate-700 uppercase tracking-widest cursor-help hover:text-slate-500">Security_Protocol_v4.0</span>
+                    <span className="text-[7px] font-bold text-slate-700 uppercase tracking-widest cursor-help hover:text-slate-500">Encrypted_Endpoint</span>
+                </div>
             </div>
-        </div>
-    </div>
-</footer>
+            </div>
+        </footer>
         </div>
     );
 };
