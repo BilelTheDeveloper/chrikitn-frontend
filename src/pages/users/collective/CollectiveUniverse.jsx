@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Instagram, Linkedin, Twitter, ShieldCheck } from 'lucide-react';
 import { 
   ExternalLink, Rocket, Fingerprint, Award, 
-  Globe, Shield, Cpu, Zap, ArrowRight, Target
+  Globe, Shield, Cpu, Zap, ArrowRight, Target, Briefcase
 } from 'lucide-react';
 
 // HELPER: Connects to your backend storage
@@ -15,14 +15,20 @@ const getImageUrl = (path) => {
 
 const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
     // --- BACKEND DATA MAPPING ---
-    // This merges your DB data with the Ultra UI placeholders
     const displayData = {
         name: data.name || "CHRIKI TEAM",
         slogan: data.slogan || "CREATIVE COLLECTIVE. DIGITAL IMPACT.",
         heroBackground: getImageUrl(data.heroBackground),
         logo: getImageUrl(data.logo),
         description: data.description || "We are a multidisciplinary elite force specialized in digital transformation.",
-        // Map real members from your collective model
+        
+        // ✅ Mapping the dynamic Services from your Create form
+        services: data.services?.length > 0 ? data.services : [
+            { title: "NEURAL INTERFACE", description: "High-end digital experiences designed for the next generation of the web." },
+            { title: "CYBER BRANDING", description: "Establishing dominant visual identities in the global digital landscape." },
+            { title: "QUANTUM DEV", description: "Scalable architecture built with precision and futuristic logic." }
+        ],
+
         members: data.members?.length > 0 ? data.members.map(m => ({
             id: m._id,
             name: m.name || m.username,
@@ -32,7 +38,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
         })) : [
             { id: 1, name: "Neural Operative", role: "Scanning...", badge: "Void", img: "https://i.pravatar.cc/150?u=1" }
         ],
-        // Map works/deployments
+
         lastWorks: data.projects?.length > 0 ? data.projects.map(p => ({
             url: getImageUrl(p.image || p.url),
             title: p.title
@@ -72,7 +78,6 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                         transition={{ delay: 0.5 }}
                         className="flex flex-col items-center"
                     >
-                        {/* THE LOGO RING */}
                         <div className="relative group mb-12">
                             <div className="absolute inset-0 rounded-[3rem] bg-amber-500 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
                             <div className="relative w-32 h-32 md:w-44 md:h-44 p-1 rounded-[3rem] bg-gradient-to-tr from-white/20 to-transparent backdrop-blur-3xl overflow-hidden shadow-2xl border border-white/10">
@@ -111,21 +116,20 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                     </motion.div>
                 </div>
                 
-                {/* DECORATIVE HUD ELEMENTS */}
                 <div className="absolute bottom-10 left-10 hidden lg:block">
-                   <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2">
                         <span className="text-[8px] font-black text-white/30 tracking-[0.4em] uppercase">Collective_Protocol</span>
                         <div className="flex items-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                             <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest">Live_On_Grid</span>
                         </div>
-                   </div>
+                    </div>
                 </div>
             </section>
 
-            {/* --- 2. VISION CONTENT: THE DNA --- */}
             <div className="container mx-auto px-6 md:px-12 space-y-60 py-40">
                 
+                {/* --- 2. VISION CONTENT: THE DNA --- */}
                 <section className="grid lg:grid-cols-2 gap-24 items-center">
                     <div className="order-2 lg:order-1">
                         <div className="relative rounded-[4rem] overflow-hidden group border border-white/5">
@@ -169,6 +173,43 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                </section>
+
+                {/* --- ✅ NEW: SERVICE BLUEPRINT SECTION (WYSIWYG Result) --- */}
+                <section>
+                    <div className="mb-24">
+                        <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter">Operational_Services</h2>
+                        <p className="text-amber-500 text-xs font-black uppercase tracking-[0.4em] mt-4">Execution Frameworks & Strategic Delivery</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {displayData.services.map((service, i) => (
+                            <motion.div 
+                                key={i}
+                                whileHover={{ y: -10 }}
+                                className="group relative p-10 rounded-[3rem] bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 hover:border-amber-500/20 transition-all duration-500 backdrop-blur-3xl overflow-hidden"
+                            >
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 blur-[50px] rounded-full -mr-16 -mt-16 group-hover:bg-amber-500/10 transition-colors" />
+                                
+                                <div className="mb-8 w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
+                                    <Briefcase size={24} />
+                                </div>
+
+                                <h3 className="text-2xl font-black italic uppercase tracking-tighter mb-4 text-white group-hover:text-amber-500 transition-colors">
+                                    {service.title}
+                                </h3>
+
+                                <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                                    {service.description}
+                                </p>
+
+                                <div className="mt-8 flex items-center gap-2 text-white/20 group-hover:text-amber-500 transition-colors">
+                                    <div className="h-px w-8 bg-current" />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">Protocol_0{i+1}</span>
+                                </div>
+                            </motion.div>
+                        ))}
                     </div>
                 </section>
 
@@ -240,48 +281,44 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
 
             {/* --- FOOTER: THE SIGNAL --- */}
             <footer className="relative border-t border-white/5 py-24 bg-black/60 backdrop-blur-2xl overflow-hidden">
-            {/* Subtle Ambient Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
-    
-            <div className="container mx-auto px-6 flex flex-col items-center">
-                {/* Social Matrix */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent" />
+        
+                <div className="container mx-auto px-6 flex flex-col items-center">
                     <div className="flex justify-center gap-8 mb-12">
-                    {[
-                    { icon: <Instagram size={18} />, label: "Instagram" },
-                    { icon: <Twitter size={18} />, label: "Twitter" },
-                    { icon: <Linkedin size={18} />, label: "LinkedIn" },
-                    { icon: <Globe size={18} />, label: "Network" }
-                ].map((social, i) => (
-                <a 
-                    key={i}
-                    href="#" 
-                    className="p-3 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-amber-500 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all duration-300 group"
-                >
-                    {social.icon}
-                </a>
-                ))}
-            </div>
+                        {[
+                            { icon: <Instagram size={18} />, label: "Instagram" },
+                            { icon: <Twitter size={18} />, label: "Twitter" },
+                            { icon: <Linkedin size={18} />, label: "LinkedIn" },
+                            { icon: <Globe size={18} />, label: "Network" }
+                        ].map((social, i) => (
+                            <a 
+                                key={i}
+                                href="#" 
+                                className="p-3 rounded-full bg-white/5 border border-white/10 text-slate-400 hover:text-amber-500 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all duration-300 group"
+                            >
+                                {social.icon}
+                            </a>
+                        ))}
+                    </div>
 
-            {/* Verification Badge */}
-            <div className="flex items-center gap-3 px-6 py-2 bg-emerald-500/5 border border-emerald-500/20 rounded-full mb-8">
-                <ShieldCheck size={14} className="text-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">
-                  Verified by <span className="text-white">Chriki Tn</span>
-                </span>
-            </div>
+                    <div className="flex items-center gap-3 px-6 py-2 bg-emerald-500/5 border border-emerald-500/20 rounded-full mb-8">
+                        <ShieldCheck size={14} className="text-emerald-500 animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">
+                            Verified by <span className="text-white">Chriki Tn</span>
+                        </span>
+                    </div>
 
-                {/* Copyright & Legal */}
-            <div className="space-y-4 text-center">
-            <p className="text-[9px] font-black uppercase tracking-[0.6em] text-white/30">
-                Authorized Access Only <span className="text-amber-500/50 mx-2">|</span> © 2026 {displayData.name}
-            </p>
-                <div className="flex justify-center gap-4">
-                    <span className="text-[7px] font-bold text-slate-700 uppercase tracking-widest cursor-help hover:text-slate-500">Security_Protocol_v4.0</span>
-                    <span className="text-[7px] font-bold text-slate-700 uppercase tracking-widest cursor-help hover:text-slate-500">Encrypted_Endpoint</span>
+                    <div className="space-y-4 text-center">
+                        <p className="text-[9px] font-black uppercase tracking-[0.6em] text-white/30">
+                            Authorized Access Only <span className="text-amber-500/50 mx-2">|</span> © 2026 {displayData.name}
+                        </p>
+                        <div className="flex justify-center gap-4">
+                            <span className="text-[7px] font-bold text-slate-700 uppercase tracking-widest cursor-help hover:text-slate-500">Security_Protocol_v4.0</span>
+                            <span className="text-[7px] font-bold text-slate-700 uppercase tracking-widest cursor-help hover:text-slate-500">Encrypted_Endpoint</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            </div>
-        </footer>
+            </footer>
         </div>
     );
 };
