@@ -39,7 +39,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                     name: data.owner.name,
                     role: data.owner.speciality || "Founding Member",
                     badge: "Prime",
-                    img: getImageUrl(data.owner.identityImage),
+                    img: getImageUrl(data.owner.biometricImage),
                     portfolio: data.owner.portfolioUrl || "#"
                 });
             }
@@ -53,7 +53,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                             name: m.user.name,
                             role: m.user.speciality || "Operative",
                             badge: m.status === 'Accepted' ? "Elite" : "Pending",
-                            img: getImageUrl(m.user.identityImage),
+                            img: getImageUrl(m.user.biometricImage),
                             portfolio: m.user.portfolioUrl || "#"
                         });
                     }
