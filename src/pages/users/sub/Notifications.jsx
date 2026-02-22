@@ -17,6 +17,7 @@ import { API_BASE_URL, getImageUrl } from '../../../config/config';
 
 // ✅ NEW CARD IMPORT
 import CollectiveNotif from '../../../components/notifications/CollectiveNotif'
+import RequestNotificationCard from '../../../components/notifications/RequestNotificationCard'; // ✅ ADDED MISSION CARD IMPORT
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -49,12 +50,12 @@ const Notifications = () => {
   }, []);
 
   // 2. Handle Mission Decisions (Accept/Reject)
-  const handleDecision = async (id, action, requestId = null) => {
+  const handleDecision = async (notifId, action, requestId = null) => {
     try {
       const token = localStorage.getItem('token');
       
       // If it's a MISSION_REQUEST, we use the requestId stored in metadata
-      const targetId = requestId || id;
+      const targetId = requestId || notifId;
 
       await axios.patch(`${API_BASE_URL}/requests/${targetId}/respond`, 
         { action: action }, 
@@ -62,7 +63,7 @@ const Notifications = () => {
       );
       
       // Remove from UI
-      setNotifications(prev => prev.filter(n => n._id !== id));
+      setNotifications(prev => prev.filter(n => n._id !== notifId));
       console.log(`PROTOCOL ${action.toUpperCase()}ED: Signal processed.`);
     } catch (err) {
       console.error("Action Error:", err.response?.data);
@@ -119,6 +120,17 @@ const Notifications = () => {
               }
 
               // 🟡 TYPE B: MISSION REQUESTS (Handshake Protocol)
+              if (isMissionRequest) {
+                return (
+                  <RequestNotificationCard 
+                    key={item._id}
+                    notification={item}
+                    onRespond={handleDecision}
+                  />
+                );
+              }
+
+              // ⚪ TYPE C: DEFAULT / OTHER ALERTS
               return (
                 <motion.div
                   key={item._id}
@@ -146,7 +158,7 @@ const Notifications = () => {
                         </div>
                         <div>
                           <h3 className="text-sm font-black uppercase tracking-tight text-white">
-                            {isMissionRequest ? "New Mission Briefing" : `Briefing: ${item.relatedPost?.title || item.title || "Operational Intel"}`}
+                            {item.relatedPost?.title || item.title || "Operational Intel"}
                           </h3>
                           <p className="text-[10px] text-amber-400 font-bold uppercase tracking-widest">
                             From Operative: {item.sender?.name || "Unknown"}
@@ -162,35 +174,12 @@ const Notifications = () => {
                       <div className="flex items-start gap-3">
                          <Target size={14} className="text-amber-500 mt-1 flex-shrink-0" />
                          <div>
-                            <p className="text-[9px] font-black text-amber-500/50 uppercase mb-1">Primary Objective</p>
+                            <p className="text-[9px] font-black text-amber-500/50 uppercase mb-1">Update Message</p>
                             <p className="text-xs text-slate-200 leading-relaxed font-medium">
                               {item.message}
                             </p>
                          </div>
                       </div>
-                      
-                      {isMissionRequest && (
-                        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/5">
-                           <FileText size={12} className="text-slate-500" />
-                           <p className="text-[9px] font-bold text-slate-500 uppercase italic">Detailed intelligence encrypted until handshake.</p>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex gap-3 pt-2">
-                      <button 
-                        onClick={() => handleDecision(item._id, 'accept', item.metadata?.requestId)}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-amber-600 hover:bg-amber-500 text-black rounded-xl transition-all font-black text-[10px] uppercase tracking-widest active:scale-95 shadow-[0_4px_15px_rgba(217,119,6,0.2)]"
-                      >
-                        <ShieldCheck size={14} />
-                        Establish Protocol
-                      </button>
-                      <button 
-                        onClick={() => handleDecision(item._id, 'reject', item.metadata?.requestId)}
-                        className="px-4 py-3 bg-transparent border border-red-500/20 hover:bg-red-500/10 text-red-500 rounded-xl transition-all active:scale-95"
-                      >
-                        <ShieldX size={16} />
-                      </button>
                     </div>
                   </div>
                 </motion.div>
