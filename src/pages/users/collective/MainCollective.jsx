@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Plus, Lock, Search, X, 
-  Upload, ShieldCheck, Zap, Layout, 
-  Info, CheckCircle2, UserPlus, Image as ImageIcon
+  Upload, Layout, Image as ImageIcon, UserPlus
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../utils/api';
 import { toast } from 'react-hot-toast';
 import { getImageUrl } from '../../../config/config';
-import CollectiveCard from './CollectiveCard'; // ✅ Imported Card Component
+import CollectiveCard from './CollectiveCard'; 
+import CollectiveUniverse from './CollectiveUniverse'; // ✅ Import the Ultra UI
 
 const MainCollective = () => {
   const { user } = useAuth();
@@ -18,7 +18,7 @@ const MainCollective = () => {
   const [collectives, setCollectives] = useState([]);
   const [fetching, setFetching] = useState(true);
   
-  // ✅ NEW: WEB-IN-WEB STATE
+  // ✅ WEB-IN-WEB STATE
   const [activeSyndicate, setActiveSyndicate] = useState(null);
   
   // Founding Form State
@@ -26,7 +26,7 @@ const MainCollective = () => {
     name: '',
     slogan: '',
     description: '',
-    members: [], // Array of user objects
+    members: [], 
   });
   
   const [logoFile, setLogoFile] = useState(null);
@@ -35,8 +35,9 @@ const MainCollective = () => {
   const [searchResults, setSearchResults] = useState([]);
 
   const isFreelancer = user?.role === 'Freelancer';
+  const isAdminOperative = user?.email === 'bilel.thedeveloper@gmail.com';
 
-  // 📡 FETCH ACTIVE COLLECTIVES & CHECK FOR OWNERSHIP/MEMBERSHIP
+  // 📡 FETCH ACTIVE COLLECTIVES
   useEffect(() => {
     const fetchCollectives = async () => {
       try {
@@ -45,14 +46,15 @@ const MainCollective = () => {
         const allCollectives = res.data.data || [];
         setCollectives(allCollectives);
 
-        // ✅ LOGIC: Check if current user is part of a DEPLOYED syndicate
+        // Check if user is already part of a deployed syndicate to auto-load it
         const mySyndicate = allCollectives.find(col => 
           col.isDeployed && 
           (col.owner?._id === user?._id || col.members?.some(m => m.user?._id === user?._id && m.status === 'Accepted'))
         );
 
         if (mySyndicate) {
-          setActiveSyndicate(mySyndicate);
+          // You can choose to auto-set it or keep it for manual selection
+          // setActiveSyndicate(mySyndicate); 
         }
 
       } catch (err) {
@@ -65,13 +67,13 @@ const MainCollective = () => {
     fetchCollectives();
   }, [user?._id]);
 
-  // 🔍 ELITE SEARCH UPDATE: Targeted Operative Discovery
+  // 🔍 OPERATIVE DISCOVERY SEARCH
   useEffect(() => {
     const delayDebounce = setTimeout(async () => {
       if (searchQuery.trim().length > 1) { 
         try {
           const res = await api.get(`/search/operatives?q=${searchQuery}`);
-          const data = res.data.data || res.data; // Handles both wrapped and unwrapped arrays
+          const data = res.data.data || res.data;
           
           const filtered = data.filter(u => 
             u._id !== user?._id && 
@@ -121,16 +123,12 @@ const MainCollective = () => {
     try {
       await api.post('/collectives/initiate', data);
       toast.success("Collective Initiated! Recruitment notifications dispatched.");
-      
-      // Refresh list and reset modal
       const refresh = await api.get('/collectives');
       setCollectives(refresh.data.data || []);
-      
       setIsModalOpen(false);
       setFormData({ name: '', slogan: '', description: '', members: [] });
       setLogoFile(null);
       setBgFile(null);
-      
     } catch (err) {
       toast.error(err.response?.data?.msg || "Founding Protocol Failed");
     } finally {
@@ -138,62 +136,29 @@ const MainCollective = () => {
     }
   };
 
-  // ✅ NEW: WEB-IN-WEB RENDER (IF ACTIVE SYNDICATE EXISTS)
+  // ✅ ULTRA UI RENDER: Active Syndicate Portal
   if (activeSyndicate) {
     return (
-      <div className="min-h-screen bg-slate-950 relative overflow-hidden">
-        {/* Dynamic Background from Database */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30 blur-sm scale-110"
-          style={{ backgroundImage: `url(${getImageUrl(activeSyndicate.heroBackground)})` }}
-        />
-        
-        <div className="relative z-10 max-w-7xl mx-auto p-8 pt-20">
-          <div className="flex flex-col items-center text-center space-y-6">
-             <motion.img 
-               initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-               src={getImageUrl(activeSyndicate.logo)} 
-               className="w-32 h-32 rounded-[2.5rem] shadow-2xl border-2 border-amber-500/50 object-cover" 
-             />
-             <motion.h1 
-               initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-               className="text-6xl md:text-8xl font-black italic uppercase tracking-tighter text-white"
-             >
-               {activeSyndicate.name}
-             </motion.h1>
-             <p className="text-amber-500 font-black uppercase tracking-[0.5em] text-sm">{activeSyndicate.slogan}</p>
-             <div className="w-20 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
-             <p className="max-w-2xl text-slate-400 text-lg leading-relaxed">{activeSyndicate.description}</p>
-          </div>
+      <div className="relative">
+        {/* Back Button HUD */}
+        <button 
+          onClick={() => setActiveSyndicate(null)}
+          className="fixed top-8 left-8 z-[200] px-6 py-3 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-white hover:bg-amber-500 hover:text-black transition-all"
+        >
+          ← Terminate Connection
+        </button>
 
-          <div className="mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-             {/* Team Member Cards rendered from activeSyndicate.members */}
-             {activeSyndicate.members.map((m, idx) => (
-                <div key={idx} className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl flex items-center gap-4">
-                  <img src={getImageUrl(m.user?.identityImage)} className="w-14 h-14 rounded-2xl object-cover" />
-                  <div>
-                    <h3 className="text-white font-bold uppercase text-sm">{m.user?.name}</h3>
-                    <p className="text-amber-500 text-[10px] font-black tracking-widest uppercase">{m.user?.speciality || 'Operative'}</p>
-                  </div>
-                </div>
-             ))}
-          </div>
-          
-          <button 
-            onClick={() => setActiveSyndicate(null)} 
-            className="mt-12 text-slate-600 text-[9px] font-black uppercase tracking-widest hover:text-white transition-colors"
-          >
-            ← Exit Syndicate Portal
-          </button>
-        </div>
+        <CollectiveUniverse 
+          data={activeSyndicate} 
+          isEditMode={isAdminOperative || activeSyndicate.owner?._id === user?._id}
+        />
       </div>
     );
   }
 
-  // --- REST OF YOUR ORIGINAL RENDER (FEED & MODAL) ---
+  // --- STANDARD GRID VIEW ---
   return (
     <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8 overflow-x-hidden">
-      {/* 1. HEADER SECTION */}
       <header className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 mb-16 pt-4">
         <div className="space-y-2 text-center md:text-left">
           <div className="flex items-center justify-center md:justify-start gap-3">
@@ -205,49 +170,38 @@ const MainCollective = () => {
           </h1>
         </div>
 
-        <div className="relative group">
-          <button 
-            hidden={!isFreelancer}
-            onClick={() => setIsModalOpen(true)}
-            className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all
-              ${isFreelancer 
-                ? 'bg-white text-black hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.1)]' 
-                : 'bg-slate-900 text-slate-600 border border-white/5 cursor-not-allowed'
-              }`}
-          >
-            {isFreelancer ? <Plus size={16} strokeWidth={3} /> : <Lock size={16} />}
-            Initiate Collective
-          </button>
-          {!isFreelancer && (
-            <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-max bg-red-500/10 text-red-500 text-[8px] font-black px-3 py-1 rounded border border-red-500/20 opacity-0 group-hover:opacity-100 transition-opacity">
-              ONLY FREELANCER OPERATIVES CAN FOUND SYNDICATES
-            </span>
-          )}
-        </div>
+        <button 
+          hidden={!isFreelancer}
+          onClick={() => setIsModalOpen(true)}
+          className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all
+            ${isFreelancer 
+              ? 'bg-white text-black hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.1)]' 
+              : 'bg-slate-900 text-slate-600 border border-white/5 cursor-not-allowed'
+            }`}
+        >
+          {isFreelancer ? <Plus size={16} strokeWidth={3} /> : <Lock size={16} />}
+          Initiate Collective
+        </button>
       </header>
 
-      {/* 2. DISCOVERY FEED */}
       <main className="max-w-7xl mx-auto">
         {fetching ? (
           <div className="col-span-full py-40 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-[4rem] bg-slate-900/20">
             <div className="w-12 h-12 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin mb-4" />
             <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">Decrypting Syndicate Data...</p>
           </div>
-        ) : collectives.length > 0 ? (
+        ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {collectives.map((col) => (
-              <CollectiveCard key={col._id} col={col} /> 
+              <div key={col._id} onClick={() => setActiveSyndicate(col)} className="cursor-pointer">
+                <CollectiveCard col={col} /> 
+              </div>
             ))}
-          </div>
-        ) : (
-          <div className="col-span-full py-40 flex flex-col items-center justify-center border-2 border-dashed border-white/5 rounded-[4rem] bg-slate-900/20">
-            <Layout size={40} className="text-slate-800 mb-4" />
-            <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-xs">No Operational Collectives Found</p>
           </div>
         )}
       </main>
 
-      {/* 3. FOUNDING MODAL */}
+      {/* FOUNDING MODAL */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
@@ -256,7 +210,6 @@ const MainCollective = () => {
               onClick={() => !loading && setIsModalOpen(false)}
               className="absolute inset-0 bg-slate-950/95 backdrop-blur-2xl"
             />
-            
             <motion.div 
               initial={{ y: 50, opacity: 0, scale: 0.9 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -284,7 +237,6 @@ const MainCollective = () => {
                       <input type="file" className="hidden" accept="image/*" onChange={(e) => setLogoFile(e.target.files[0])} />
                     </label>
                   </div>
-                  
                   <div className="md:col-span-2 space-y-6">
                     <div className="space-y-2">
                       <label className="text-[9px] font-black uppercase text-slate-500">Collective Name</label>
@@ -300,13 +252,13 @@ const MainCollective = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase text-slate-500">Intel Summary (About the Collective)</label>
-                  <textarea required rows={4} placeholder="Describe the combined power of your team..." className="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-amber-500 resize-none"
+                  <label className="text-[9px] font-black uppercase text-slate-500">Intel Summary</label>
+                  <textarea required rows={4} placeholder="Describe the team..." className="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 text-white outline-none focus:border-amber-500 resize-none"
                     onChange={(e) => setFormData({...formData, description: e.target.value})} />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[9px] font-black uppercase text-slate-500">Portal Visual (Hero Background)</label>
+                  <label className="text-[9px] font-black uppercase text-slate-500">Portal Visual (Background)</label>
                   <label className="flex items-center gap-4 p-4 bg-slate-950 border border-white/10 rounded-2xl cursor-pointer hover:bg-slate-900 transition-all">
                     <ImageIcon className="text-amber-500" />
                     <span className="text-xs text-slate-400">{bgFile ? bgFile.name : "Select High-Res Background"}</span>
@@ -317,24 +269,16 @@ const MainCollective = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-end">
                     <label className="text-[9px] font-black uppercase text-amber-500">02. Strike Team Recruitment</label>
-                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em]">
-                      {formData.members.length} / 5 Operatives
-                    </span>
+                    <span className="text-[8px] font-black text-slate-500 uppercase">{formData.members.length} / 5</span>
                   </div>
-                  
                   <div className="relative">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
-                    <input 
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search operatives by name..." 
-                      className="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 pl-12 text-white outline-none focus:border-amber-500" 
-                    />
-                    
+                    <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search operatives..." 
+                      className="w-full bg-slate-950 border border-white/10 rounded-2xl p-4 pl-12 text-white outline-none focus:border-amber-500" />
                     {searchResults.length > 0 && (
-                      <div className="absolute top-full left-0 w-full bg-slate-800 border border-white/10 mt-2 rounded-2xl overflow-hidden z-[160] shadow-2xl max-h-60 overflow-y-auto">
+                      <div className="absolute top-full left-0 w-full bg-slate-800 border border-white/10 mt-2 rounded-2xl overflow-hidden z-[160] shadow-2xl">
                         {searchResults.map(u => (
-                          <button key={u._id} type="button" onClick={() => addMember(u)} className="w-full flex items-center gap-4 p-4 hover:bg-white/5 transition-all border-b border-white/5 last:border-0">
+                          <button key={u._id} type="button" onClick={() => addMember(u)} className="w-full flex items-center gap-4 p-4 hover:bg-white/5 transition-all">
                             <img src={getImageUrl(u.identityImage)} className="w-10 h-10 rounded-lg object-cover" alt="" />
                             <div className="text-left">
                               <p className="text-xs font-bold text-white uppercase">{u.name}</p>
@@ -346,32 +290,18 @@ const MainCollective = () => {
                       </div>
                     )}
                   </div>
-
                   <div className="flex flex-wrap gap-3">
                     {formData.members.map(m => (
-                      <div key={m._id} className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded-xl group transition-all hover:bg-amber-500/20">
-                        <img src={getImageUrl(m.identityImage)} className="w-4 h-4 rounded-md object-cover" alt="" />
+                      <div key={m._id} className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 px-3 py-2 rounded-xl">
                         <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">{m.name}</span>
-                        <button type="button" onClick={() => removeMember(m._id)} className="text-amber-500 hover:text-white transition-colors"><X size={12}/></button>
+                        <button type="button" onClick={() => removeMember(m._id)} className="text-amber-500"><X size={12}/></button>
                       </div>
                     ))}
-                    {formData.members.length === 0 && (
-                      <p className="text-[8px] text-slate-600 uppercase font-bold italic tracking-wider">No operatives drafted yet...</p>
-                    )}
                   </div>
                 </div>
 
-                <button 
-                  disabled={loading}
-                  type="submit"
-                  className="w-full py-6 bg-gradient-to-r from-amber-600 to-amber-500 text-black font-black uppercase tracking-[0.4em] text-xs rounded-[2rem] hover:scale-[1.02] active:scale-95 transition-all shadow-xl disabled:opacity-50"
-                >
-                  {loading ? (
-                    <div className="flex items-center justify-center gap-3">
-                      <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                      Transmitting Data...
-                    </div>
-                  ) : "Initiate Global Syndicate"}
+                <button disabled={loading} type="submit" className="w-full py-6 bg-gradient-to-r from-amber-600 to-amber-500 text-black font-black uppercase tracking-[0.4em] text-xs rounded-[2rem] hover:scale-[1.02] transition-all shadow-xl disabled:opacity-50">
+                  {loading ? "Transmitting Data..." : "Initiate Global Syndicate"}
                 </button>
               </form>
             </motion.div>
