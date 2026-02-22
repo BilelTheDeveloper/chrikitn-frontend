@@ -9,8 +9,7 @@ const MainDashboard = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                // ✅ MANUAL FIX: Replaced undefined variable with your actual Render URL
-                // If your render URL is different, please update this string.
+                // Keep your Render URL
                 const backendUrl = "https://chrikitn-backend.onrender.com"; 
                 
                 const res = await axios.get(`${backendUrl}/api/admin/dashboard-stats`, {
@@ -27,6 +26,7 @@ const MainDashboard = () => {
         fetchStats();
     }, []);
 
+    // 1. Loading Guard (Prevents reading properties of null)
     if (loading || !stats) {
         return (
             <div className="h-[60vh] flex flex-col items-center justify-center">
@@ -38,10 +38,16 @@ const MainDashboard = () => {
         );
     }
 
-    const chartData = stats.users?.growthData?.map(item => ({
-        name: `Month ${item._id.month}`,
-        users: item.count
-    })) || [];
+    // 2. Safe Data Mapping (Prevents .length or .map errors)
+    const growthDataRaw = stats?.users?.growthData || [];
+    const chartData = growthDataRaw.length > 0 
+        ? growthDataRaw.map(item => ({
+            name: `Month ${item._id?.month || '?'}`,
+            users: item.count || 0
+          }))
+        : [];
+
+    const roleData = stats?.users?.roleBreakdown || [];
 
     return (
         <div className="animate-in fade-in duration-500">
@@ -57,18 +63,22 @@ const MainDashboard = () => {
                         {stats.users?.userCounts?.find(u => u._id === 'Active')?.count || 0}
                     </h2>
                 </div>
-                <div className="bg-slate-900/40 border border-white/5 p-6 rounded-[2rem]">
-                    <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2">Pending Verification</p>
-                    <h2 className="text-4xl font-black text-yellow-500 italic">
-                        {stats.users?.userCounts?.find(u => u._id === 'Pending')?.count || 0}
+                
+                {/* NEW: Collective Deployment Card */}
+                <div className="bg-slate-900/40 border border-amber-500/20 p-6 rounded-[2rem]">
+                    <p className="text-amber-500/60 text-[10px] font-black uppercase tracking-widest mb-2">Pending Syndicates</p>
+                    <h2 className="text-4xl font-black text-amber-500 italic">
+                        {stats.pendingCollectives || 0}
                     </h2>
                 </div>
+
                 <div className="bg-slate-900/40 border border-white/5 p-6 rounded-[2rem]">
                     <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-2">VIP Intel Queue</p>
                     <h2 className="text-4xl font-black text-blue-500 italic">
                         {stats.vipPosts?.find(v => v._id === false)?.count || 0}
                     </h2>
                 </div>
+
                 <div className="bg-slate-900/40 border border-white/5 p-6 rounded-[2rem] flex items-center justify-center">
                     <div className="text-center">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mx-auto mb-2" />
@@ -79,9 +89,10 @@ const MainDashboard = () => {
 
             {/* --- MIDDLE ROW: CHARTS --- */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-slate-900/40 p-8 rounded-[3rem] border border-white/5">
+                {/* Growth Protocol Chart */}
+                <div className="bg-slate-900/40 p-8 rounded-[3rem] border border-white/5 min-h-[350px]">
                     <h3 className="text-xs font-black mb-8 text-slate-400 uppercase tracking-[0.2em]">Growth Protocol</h3>
-                    <div className="h-64">
+                    <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={chartData}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
@@ -94,11 +105,12 @@ const MainDashboard = () => {
                     </div>
                 </div>
 
-                <div className="bg-slate-900/40 p-8 rounded-[3rem] border border-white/5">
+                {/* Force Composition Chart */}
+                <div className="bg-slate-900/40 p-8 rounded-[3rem] border border-white/5 min-h-[350px]">
                     <h3 className="text-xs font-black mb-8 text-slate-400 uppercase tracking-[0.2em]">Force Composition</h3>
-                    <div className="h-64">
+                    <div className="h-64 w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={stats.users?.roleBreakdown}>
+                            <BarChart data={roleData}>
                                 <XAxis dataKey="_id" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
                                 <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
                                 <Tooltip cursor={{fill: 'transparent'}} contentStyle={{ backgroundColor: '#020617', border: '1px solid #1e293b', borderRadius: '1rem' }} />
