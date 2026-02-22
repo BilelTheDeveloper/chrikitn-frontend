@@ -26,6 +26,7 @@ import UserVerification from './pages/admin/UserVerification';
 import VipVerification from './pages/admin/VipVerification'; 
 import RoleVerification from './pages/admin/RoleVerification'; 
 import AdminAccess from './pages/admin/AdminAccess'; 
+import CollectiveVerification from './pages/admin/AdminCollectiveVerification'; // ✅ ADDED: Admin Collective Management
 
 // 5. User Main Layout & Sub-pages
 import Main from './pages/users/Mainn';
@@ -145,6 +146,7 @@ const AppContent = () => {
                 <Route path="access" element={isAdmin ? <AdminAccess /> : <Navigate to="/" />} />
                 <Route path="vip-intel" element={isAdmin ? <VipVerification /> : <Navigate to="/" />} /> 
                 <Route path="roles" element={isAdmin ? <RoleVerification /> : <Navigate to="/" />} />
+                <Route path="collectives" element={isAdmin ? <CollectiveVerification /> : <Navigate to="/" />} /> {/* ✅ ADDED NEW ADMIN ROUTE */}
               </Route>
           </Route>
           

@@ -7,7 +7,9 @@ import {
   Clock,
   Cpu,
   ShieldCheck,
-  ShieldX
+  ShieldX,
+  Target,
+  FileText
 } from 'lucide-react';
 
 // ✅ CONFIG INTEGRATION:
@@ -30,7 +32,6 @@ const Notifications = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      // ✅ SAFETY FIX: Check both res.data.data AND res.data
       const incomingData = res.data.data || res.data || [];
       console.log("📡 SIGNAL SCAN COMPLETE:", incomingData);
       
@@ -38,7 +39,7 @@ const Notifications = () => {
       setLoading(false);
     } catch (err) {
       console.error("Signal Interruption:", err);
-      setNotifications([]); // Prevent breaking map on error
+      setNotifications([]); 
       setLoading(false);
     }
   };
@@ -48,17 +49,20 @@ const Notifications = () => {
   }, []);
 
   // 2. Handle Mission Decisions (Accept/Reject)
-  const handleDecision = async (id, action) => {
+  const handleDecision = async (id, action, requestId = null) => {
     try {
       const token = localStorage.getItem('token');
       
-      await axios.patch(`${API_BASE_URL}/requests/${id}/respond`, 
+      // If it's a MISSION_REQUEST, we use the requestId stored in metadata
+      const targetId = requestId || id;
+
+      await axios.patch(`${API_BASE_URL}/requests/${targetId}/respond`, 
         { action: action }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
+      // Remove from UI
       setNotifications(prev => prev.filter(n => n._id !== id));
-      // Replace with toast if available for better style
       console.log(`PROTOCOL ${action.toUpperCase()}ED: Signal processed.`);
     } catch (err) {
       console.error("Action Error:", err.response?.data);
@@ -93,9 +97,10 @@ const Notifications = () => {
         <AnimatePresence mode='popLayout'>
           {notifications.length > 0 ? (
             notifications.map((item) => {
-              // ✅ NORMALIZED TYPE CHECK: Prevents case-sensitivity issues
               const isCollective = item.type?.toUpperCase() === 'COLLECTIVE_INVITE';
+              const isMissionRequest = item.type?.toUpperCase() === 'MISSION_REQUEST';
 
+              // 🟢 TYPE A: COLLECTIVE INVITATIONS
               if (isCollective) {
                 return (
                   <motion.div
@@ -113,7 +118,7 @@ const Notifications = () => {
                 );
               }
 
-              // ✅ DEFAULT MISSION CARD (REMAINING UNTOUCHED)
+              // 🟡 TYPE B: MISSION REQUESTS (Handshake Protocol)
               return (
                 <motion.div
                   key={item._id}
@@ -141,7 +146,7 @@ const Notifications = () => {
                         </div>
                         <div>
                           <h3 className="text-sm font-black uppercase tracking-tight text-white">
-                            Briefing: {item.relatedPost?.title || item.title || "Operational Intel"}
+                            {isMissionRequest ? "New Mission Briefing" : `Briefing: ${item.relatedPost?.title || item.title || "Operational Intel"}`}
                           </h3>
                           <p className="text-[10px] text-amber-400 font-bold uppercase tracking-widest">
                             From Operative: {item.sender?.name || "Unknown"}
@@ -154,24 +159,34 @@ const Notifications = () => {
                     </div>
 
                     <div className="space-y-3 bg-black/30 p-4 rounded-xl border border-white/5">
-                      <div>
-                        <p className="text-[9px] font-black text-amber-500/50 uppercase mb-1">Primary Objective</p>
-                        <p className="text-xs text-slate-200 leading-relaxed font-medium">
-                          {item.globalMissionObjective || item.message}
-                        </p>
+                      <div className="flex items-start gap-3">
+                         <Target size={14} className="text-amber-500 mt-1 flex-shrink-0" />
+                         <div>
+                            <p className="text-[9px] font-black text-amber-500/50 uppercase mb-1">Primary Objective</p>
+                            <p className="text-xs text-slate-200 leading-relaxed font-medium">
+                              {item.message}
+                            </p>
+                         </div>
                       </div>
+                      
+                      {isMissionRequest && (
+                        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-white/5">
+                           <FileText size={12} className="text-slate-500" />
+                           <p className="text-[9px] font-bold text-slate-500 uppercase italic">Detailed intelligence encrypted until handshake.</p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex gap-3 pt-2">
                       <button 
-                        onClick={() => handleDecision(item._id, 'accept')}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-amber-600 hover:bg-amber-500 text-black rounded-xl transition-all font-black text-[10px] uppercase tracking-widest active:scale-95"
+                        onClick={() => handleDecision(item._id, 'accept', item.metadata?.requestId)}
+                        className="flex-1 flex items-center justify-center gap-2 py-3 bg-amber-600 hover:bg-amber-500 text-black rounded-xl transition-all font-black text-[10px] uppercase tracking-widest active:scale-95 shadow-[0_4px_15px_rgba(217,119,6,0.2)]"
                       >
                         <ShieldCheck size={14} />
                         Establish Protocol
                       </button>
                       <button 
-                        onClick={() => handleDecision(item._id, 'reject')}
+                        onClick={() => handleDecision(item._id, 'reject', item.metadata?.requestId)}
                         className="px-4 py-3 bg-transparent border border-red-500/20 hover:bg-red-500/10 text-red-500 rounded-xl transition-all active:scale-95"
                       >
                         <ShieldX size={16} />
