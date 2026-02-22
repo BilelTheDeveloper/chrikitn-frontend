@@ -17,7 +17,7 @@ import FeedbackPage from './pages/public/FeedbackPage';
 // 3. Authentication Pages
 import Login from './pages/public/Login';
 import Signup from './pages/public/Signup';
-import ForgotPassword from './pages/public/ForgotPassword'; // ✅ ADDED
+import ForgotPassword from './pages/public/ForgotPassword'; 
 
 // 4. Admin & Protected Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -35,6 +35,7 @@ import VipFeed from './pages/users/sub/VipFeed';
 // ✅ UPDATED COLLECTIVE IMPORTS
 import MotherCollective from './pages/users/collective/MotherCollective'; 
 import CollectiveUniverse from './pages/users/collective/CollectiveUniverse';
+import CreateCollective from './pages/users/collective/CreateCollective'; // ✅ IMPORTED NEW PAGE
 
 import Notifications from './pages/users/sub/Notifications'; 
 import Profile from './pages/users/Profile'; 
@@ -78,7 +79,7 @@ const AppContent = () => {
   const userRole = userData?.role || 'Normal';
   const userSyndicateId = userData?.collectiveId || null;
 
-  // 🔒 ROLE GATEKEEPER (Now using the Whitelist flag from our backend login)
+  // 🔒 ROLE GATEKEEPER 
   const isAdmin = userData?.isAdmin === true && userData?.status === 'Active'; 
   const hasVipAccess = (userRole === 'Freelancer' || userRole === 'Brand' || isAdmin) && userData?.status === 'Active';
 
@@ -111,13 +112,16 @@ const AppContent = () => {
                   element={hasVipAccess ? <VipFeed /> : <VipAccessDenied />} 
                 />
                 
-                {/* ✅ UPDATED: THE MOTHER COLLECTIVE GATEWAY */}
+                {/* ✅ COLLECTIVE SYSTEM */}
                 <Route 
                   path="collective" 
                   element={<MotherCollective userRole={userRole} userSyndicateId={userSyndicateId} />} 
                 />
                 
-                {/* ✅ NEW: ROUTE TO ENTER A SPECIFIC UNIVERSE (READ ONLY) */}
+                {/* ✅ NEW: DEDICATED PAGE FOR CREATION */}
+                <Route path="create-collective" element={<CreateCollective />} />
+
+                {/* ✅ ROUTE TO ENTER A SPECIFIC UNIVERSE (READ ONLY) */}
                 <Route path="collective/:id" element={<CollectiveUniverse isEditMode={false} />} />
 
                 <Route path="apply-vip" element={<VipApplicationForm />} /> 

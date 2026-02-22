@@ -37,7 +37,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
             url: getImageUrl(p.image || p.url),
             title: p.title
         })) : [
-            { url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80" },
+            { url: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" },
             { url: "https://images.unsplash.com/photo-1633167606207-d840b5070fc2?auto=format&fit=crop&q=80" },
             { url: "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80" }
         ]
