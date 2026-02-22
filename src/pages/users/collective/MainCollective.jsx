@@ -18,6 +18,9 @@ const MainCollective = () => {
   const [collectives, setCollectives] = useState([]);
   const [fetching, setFetching] = useState(true);
   
+  // ✅ NEW: WEB-IN-WEB STATE
+  const [activeSyndicate, setActiveSyndicate] = useState(null);
+  
   // Founding Form State
   const [formData, setFormData] = useState({
     name: '',
@@ -33,14 +36,25 @@ const MainCollective = () => {
 
   const isFreelancer = user?.role === 'Freelancer';
 
-  // 📡 FETCH ACTIVE COLLECTIVES
+  // 📡 FETCH ACTIVE COLLECTIVES & CHECK FOR OWNERSHIP/MEMBERSHIP
   useEffect(() => {
     const fetchCollectives = async () => {
       try {
         setFetching(true);
         const res = await api.get('/collectives');
-        // ✅ FIX: Backend returns { data: [...] }
-        setCollectives(res.data.data || []);
+        const allCollectives = res.data.data || [];
+        setCollectives(allCollectives);
+
+        // ✅ LOGIC: Check if current user is part of a DEPLOYED syndicate
+        const mySyndicate = allCollectives.find(col => 
+          col.isDeployed && 
+          (col.owner?._id === user?._id || col.members?.some(m => m.user?._id === user?._id && m.status === 'Accepted'))
+        );
+
+        if (mySyndicate) {
+          setActiveSyndicate(mySyndicate);
+        }
+
       } catch (err) {
         console.error("Discovery Error:", err);
         toast.error("Failed to sync with Syndicate Grid");
@@ -49,7 +63,7 @@ const MainCollective = () => {
       }
     };
     fetchCollectives();
-  }, []);
+  }, [user?._id]);
 
   // 🔍 ELITE SEARCH UPDATE: Targeted Operative Discovery
   useEffect(() => {
@@ -124,6 +138,59 @@ const MainCollective = () => {
     }
   };
 
+  // ✅ NEW: WEB-IN-WEB RENDER (IF ACTIVE SYNDICATE EXISTS)
+  if (activeSyndicate) {
+    return (
+      <div className="min-h-screen bg-slate-950 relative overflow-hidden">
+        {/* Dynamic Background from Database */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 blur-sm scale-110"
+          style={{ backgroundImage: `url(${getImageUrl(activeSyndicate.heroBackground)})` }}
+        />
+        
+        <div className="relative z-10 max-w-7xl mx-auto p-8 pt-20">
+          <div className="flex flex-col items-center text-center space-y-6">
+             <motion.img 
+               initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+               src={getImageUrl(activeSyndicate.logo)} 
+               className="w-32 h-32 rounded-[2.5rem] shadow-2xl border-2 border-amber-500/50 object-cover" 
+             />
+             <motion.h1 
+               initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+               className="text-6xl md:text-8xl font-black italic uppercase tracking-tighter text-white"
+             >
+               {activeSyndicate.name}
+             </motion.h1>
+             <p className="text-amber-500 font-black uppercase tracking-[0.5em] text-sm">{activeSyndicate.slogan}</p>
+             <div className="w-20 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
+             <p className="max-w-2xl text-slate-400 text-lg leading-relaxed">{activeSyndicate.description}</p>
+          </div>
+
+          <div className="mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+             {/* Team Member Cards rendered from activeSyndicate.members */}
+             {activeSyndicate.members.map((m, idx) => (
+                <div key={idx} className="bg-white/5 backdrop-blur-md border border-white/10 p-6 rounded-3xl flex items-center gap-4">
+                  <img src={getImageUrl(m.user?.identityImage)} className="w-14 h-14 rounded-2xl object-cover" />
+                  <div>
+                    <h3 className="text-white font-bold uppercase text-sm">{m.user?.name}</h3>
+                    <p className="text-amber-500 text-[10px] font-black tracking-widest uppercase">{m.user?.speciality || 'Operative'}</p>
+                  </div>
+                </div>
+             ))}
+          </div>
+          
+          <button 
+            onClick={() => setActiveSyndicate(null)} 
+            className="mt-12 text-slate-600 text-[9px] font-black uppercase tracking-widest hover:text-white transition-colors"
+          >
+            ← Exit Syndicate Portal
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- REST OF YOUR ORIGINAL RENDER (FEED & MODAL) ---
   return (
     <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8 overflow-x-hidden">
       {/* 1. HEADER SECTION */}
@@ -169,7 +236,7 @@ const MainCollective = () => {
         ) : collectives.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {collectives.map((col) => (
-              <CollectiveCard key={col._id} col={col} /> // ✅ Card used here
+              <CollectiveCard key={col._id} col={col} /> 
             ))}
           </div>
         ) : (
