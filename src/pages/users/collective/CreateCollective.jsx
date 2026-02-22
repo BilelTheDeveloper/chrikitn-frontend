@@ -32,7 +32,7 @@ const CreateCollective = () => {
   useEffect(() => {
     if (user && user.role !== 'Freelancer') {
       toast.error("ACCESS DENIED: Freelancer Role Required");
-      navigate('/collectives');
+      navigate('/main/collective');
     }
   }, [user, navigate]);
 
@@ -111,7 +111,7 @@ const CreateCollective = () => {
       <div className="relative z-10 max-w-5xl mx-auto px-6 pt-12">
         {/* Navigation HUD */}
         <button 
-          onClick={() => navigate('/collectives')}
+          onClick={() => navigate('/main/collective')}
           className="group flex items-center gap-3 text-slate-500 hover:text-white transition-colors mb-12"
         >
           <div className="p-2 rounded-xl bg-white/5 border border-white/10 group-hover:border-amber-500/50">
