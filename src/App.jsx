@@ -93,7 +93,7 @@ const AppContent = () => {
           {/* AUTH ROUTES */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} /> {/* ✅ ADDED */}
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           
           {/* GATEKEEPER ROUTE */}
           <Route path="/status" element={<UnderReview />} />
@@ -106,7 +106,8 @@ const AppContent = () => {
                   path="vip" 
                   element={hasVipAccess ? <VipFeed /> : <VipAccessDenied />} 
                 />
-                <Route path="collective" element={<MainCollective />} /> {/* ✅ NEW: COLLECTIVE PAGE REGISTERED */}
+                {/* ✅ COLLECTIVE HUB REGISTERED UNDER /main/collective */}
+                <Route path="collective" element={<MainCollective />} /> 
                 <Route path="apply-vip" element={<VipApplicationForm />} /> 
                 <Route path="connections" element={<Connections />} />
                 <Route path="chat/:connectionId" element={<ChatRoom />} />
@@ -128,6 +129,7 @@ const AppContent = () => {
                 <Route path="access" element={isAdmin ? <AdminAccess /> : <Navigate to="/" />} />
                 <Route path="vip-intel" element={isAdmin ? <VipVerification /> : <Navigate to="/" />} /> 
                 <Route path="roles" element={isAdmin ? <RoleVerification /> : <Navigate to="/" />} />
+                {/* Note: collective_deployment is handled via tab state inside AdminDashboard */}
               </Route>
           </Route>
           

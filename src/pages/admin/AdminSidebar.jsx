@@ -6,13 +6,14 @@ import {
   Settings, 
   Crown, 
   Lock,
-  LayoutDashboard // ✅ Icon for the Main Dashboard
+  LayoutDashboard,
+  Rocket // ✅ New Icon for Collective Deployment
 } from 'lucide-react';
 
 const AdminSidebar = ({ activeTab, setActiveTab, isSidebarOpen }) => {
   
   const menuItems = [
-    // ✅ NEW: Main Dashboard (Command Center)
+    // ✅ Main Dashboard (Command Center)
     {
       id: 'MainDashboard',
       label: 'Main Dashboard',
@@ -32,6 +33,12 @@ const AdminSidebar = ({ activeTab, setActiveTab, isSidebarOpen }) => {
       id: 'vip_verification',
       label: 'VIP Intel',
       icon: <Crown size={18} />,
+    },
+    // ✅ NEW: Collective Deployment Module
+    {
+      id: 'collective_deployment',
+      label: 'Syndicate Gates',
+      icon: <Rocket size={18} />,
     },
     {
       id: 'roles',

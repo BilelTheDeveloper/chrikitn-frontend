@@ -6,7 +6,9 @@ import PostVerification from './PostVerification';
 import VipVerification from './VipVerification'; 
 import RoleVerification from './RoleVerification';
 import AdminAccess from './AdminAccess'; 
-import MainDashboard from './MainDashboard'; // ✅ NEW IMPORT
+import MainDashboard from './MainDashboard'; 
+// ✅ NEW IMPORT: The Collective Deployment Page
+import AdminCollectiveVerification from './AdminCollectiveVerification'; 
 
 const AdminDashboard = () => {
   // Set default to 'MainDashboard' so you see your stats immediately on login
@@ -16,7 +18,7 @@ const AdminDashboard = () => {
   // Helper function to render the active module
   const renderTabContent = () => {
     switch (activeTab) {
-      // ✅ NEW CASE: Main Visual Stats Module
+      // ✅ Main Visual Stats Module
       case 'MainDashboard': 
         return <MainDashboard />;
 
@@ -34,6 +36,10 @@ const AdminDashboard = () => {
 
       case 'access_control': 
         return <AdminAccess />;
+
+      // ✅ NEW CASE: The Syndicate Deployment Gate
+      case 'collective_deployment': 
+        return <AdminCollectiveVerification />;
       
       default:
         return (
