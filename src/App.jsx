@@ -31,7 +31,10 @@ import AdminAccess from './pages/admin/AdminAccess';
 import Main from './pages/users/Mainn';
 import UserFeed from './pages/users/sub/UserFeed';
 import VipFeed from './pages/users/sub/VipFeed';
-import MainCollective from './pages/users/collective/MainCollective'; // ✅ NEW: COLLECTIVE HUB
+
+// ✅ UPDATED COLLECTIVE IMPORTS
+import MotherCollective from './pages/users/collective/MotherCollective'; 
+import CollectiveUniverse from './pages/users/collective/CollectiveUniverse';
 
 import Notifications from './pages/users/sub/Notifications'; 
 import Profile from './pages/users/Profile'; 
@@ -73,6 +76,7 @@ const AppContent = () => {
   // 🛡️ AUTHENTICATION LOGIC
   const userData = JSON.parse(localStorage.getItem('user')) || {}; 
   const userRole = userData?.role || 'Normal';
+  const userSyndicateId = userData?.collectiveId || null;
 
   // 🔒 ROLE GATEKEEPER (Now using the Whitelist flag from our backend login)
   const isAdmin = userData?.isAdmin === true && userData?.status === 'Active'; 
@@ -106,8 +110,16 @@ const AppContent = () => {
                   path="vip" 
                   element={hasVipAccess ? <VipFeed /> : <VipAccessDenied />} 
                 />
-                {/* ✅ COLLECTIVE HUB REGISTERED UNDER /main/collective */}
-                <Route path="collective" element={<MainCollective />} /> 
+                
+                {/* ✅ UPDATED: THE MOTHER COLLECTIVE GATEWAY */}
+                <Route 
+                  path="collective" 
+                  element={<MotherCollective userRole={userRole} userSyndicateId={userSyndicateId} />} 
+                />
+                
+                {/* ✅ NEW: ROUTE TO ENTER A SPECIFIC UNIVERSE (READ ONLY) */}
+                <Route path="collective/:id" element={<CollectiveUniverse isEditMode={false} />} />
+
                 <Route path="apply-vip" element={<VipApplicationForm />} /> 
                 <Route path="connections" element={<Connections />} />
                 <Route path="chat/:connectionId" element={<ChatRoom />} />
@@ -129,7 +141,6 @@ const AppContent = () => {
                 <Route path="access" element={isAdmin ? <AdminAccess /> : <Navigate to="/" />} />
                 <Route path="vip-intel" element={isAdmin ? <VipVerification /> : <Navigate to="/" />} /> 
                 <Route path="roles" element={isAdmin ? <RoleVerification /> : <Navigate to="/" />} />
-                {/* Note: collective_deployment is handled via tab state inside AdminDashboard */}
               </Route>
           </Route>
           

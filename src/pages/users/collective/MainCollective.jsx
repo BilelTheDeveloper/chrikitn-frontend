@@ -9,6 +9,7 @@ import { useAuth } from '../../../context/AuthContext';
 import api from '../../../utils/api';
 import { toast } from 'react-hot-toast';
 import { getImageUrl } from '../../../config/config';
+import CollectiveCard from './CollectiveCard'; // ✅ Imported Card Component
 
 const MainCollective = () => {
   const { user } = useAuth();
@@ -139,7 +140,7 @@ const MainCollective = () => {
 
         <div className="relative group">
           <button 
-            disabled={!isFreelancer}
+            hidden={!isFreelancer}
             onClick={() => setIsModalOpen(true)}
             className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all
               ${isFreelancer 
@@ -168,25 +169,7 @@ const MainCollective = () => {
         ) : collectives.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {collectives.map((col) => (
-              <div key={col._id} className="group relative bg-slate-900 border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-amber-500/30 transition-all duration-500">
-                <div className="h-48 overflow-hidden">
-                  <img src={getImageUrl(col.heroBackground)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" />
-                </div>
-                <div className="p-8">
-                  <div className="flex justify-between items-start mb-4">
-                    <img src={getImageUrl(col.logo)} className="w-16 h-16 rounded-2xl border-2 border-slate-950 -mt-16 bg-slate-900 object-cover" alt="" />
-                    <div className="bg-amber-500/10 text-amber-500 text-[8px] font-black px-3 py-1 rounded-full border border-amber-500/20 uppercase tracking-widest">
-                      Rank #{col.rating || 0}
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-black uppercase italic tracking-tighter text-white">{col.name}</h3>
-                  <p className="text-amber-500/80 text-[10px] font-bold uppercase tracking-widest mb-4">{col.slogan}</p>
-                  <p className="text-slate-400 text-xs line-clamp-2 mb-6">{col.description}</p>
-                  <button className="w-full py-4 bg-white/5 hover:bg-white text-white hover:text-black text-[10px] font-black uppercase tracking-[0.2em] rounded-xl transition-all">
-                    View Syndicate Portal
-                  </button>
-                </div>
-              </div>
+              <CollectiveCard key={col._id} col={col} /> // ✅ Card used here
             ))}
           </div>
         ) : (
