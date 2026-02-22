@@ -74,7 +74,7 @@ const MainCollective = () => {
         {/* Updated Button to Navigate instead of opening Modal */}
         <button 
           hidden={!isFreelancer}
-          onClick={() => navigate('/create-collective')}
+          onClick={() => navigate('/main/create-collective')}
           className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest transition-all
             ${isFreelancer 
               ? 'bg-white text-black hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.1)]' 
