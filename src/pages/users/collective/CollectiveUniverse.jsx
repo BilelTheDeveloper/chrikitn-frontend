@@ -146,7 +146,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                             <span className="text-[10px] font-black uppercase tracking-[0.5em] text-slate-500">Syndicate_ID</span>
                         </div>
                         <h2 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-none">
-                            {"About" ||displayData.name}
+                            About Us
                         </h2>
                         <p className="text-slate-400 text-xl leading-relaxed font-light">
                             {displayData.description}
