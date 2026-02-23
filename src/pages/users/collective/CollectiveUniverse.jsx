@@ -13,7 +13,7 @@ const getImageUrl = (path) => {
   return `http://localhost:5000${path}`; 
 };
 
-const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
+const CollectiveUniverse = ({ data = {}, isEditMode = false, currentUserEmail = "" }) => {
     // --- BACKEND DATA MAPPING ---
     const displayData = {
         name: data.name || "CHRIKI TEAM",
@@ -76,6 +76,9 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
         ]
     };
 
+    // ✅ CHECK FOR ADMIN ACCESS
+    const hasAdminAccess = isEditMode || currentUserEmail === "bilel.thedeveloper@gmail.com";
+
     return (
         <div className="relative min-h-screen bg-[#020617] text-white selection:bg-amber-500/30 overflow-x-hidden font-sans">
             
@@ -133,7 +136,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false }) => {
                                 </span>
                                 <div className="absolute inset-0 bg-amber-500 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
                             </button>
-                            {isEditMode && (
+                            {hasAdminAccess && (
                                 <button className="px-8 py-4 rounded-xl border border-amber-500/50 text-amber-500 font-bold text-[10px] uppercase tracking-widest hover:bg-amber-500/10 transition-all">
                                     Admin Dashboard
                                 </button>
