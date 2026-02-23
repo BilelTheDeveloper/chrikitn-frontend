@@ -208,7 +208,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false, currentUserEmail = 
                 {/* --- 3. SERVICES --- */}
                 <section>
                     <div className="mb-24">
-                        <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter">Operational_Services</h2>
+                        <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter">Our Services</h2>
                         <p className="text-amber-500 text-xs font-black uppercase tracking-[0.4em] mt-4">Execution Frameworks & Strategic Delivery</p>
                     </div>
 
@@ -246,7 +246,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false, currentUserEmail = 
                 <section>
                     <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
                         <div>
-                            <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter">Neural_Operatives</h2>
+                            <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter">Our Team</h2>
                             <p className="text-amber-500 text-xs font-black uppercase tracking-[0.4em] mt-4">Unified Strategic Syndicate</p>
                         </div>
                     </div>
@@ -287,7 +287,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false, currentUserEmail = 
                 {/* --- 5. MISSION ARCHIVE --- */}
                 <section className="pb-40">
                     <div className="flex items-center gap-6 mb-16">
-                        <h2 className="text-5xl font-black uppercase italic tracking-tighter">Mission_Archive</h2>
+                        <h2 className="text-5xl font-black uppercase italic tracking-tighter">Mission Archive</h2>
                         <div className="flex-1 h-px bg-gradient-to-r from-white/20 to-transparent" />
                     </div>
 
