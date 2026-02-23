@@ -1,1 +1,32 @@
 @import "tailwindcss";
+/* --- ELITE SYNDICATE SCROLLBAR --- */
+
+/* 1. The background of the scrollbar (track) */
+::-webkit-scrollbar {
+  width: 8px;              /* Thin & Professional */
+  height: 8px;             /* For horizontal scrolling */
+}
+
+/* 2. The area behind the thumb */
+::-webkit-scrollbar-track {
+  background: #020617;     /* Matches your bg-slate-950 */
+}
+
+/* 3. The draggable handle (thumb) */
+::-webkit-scrollbar-thumb {
+  background: #1e293b;     /* Slate-800: Subtle when not in use */
+  border-radius: 100px;
+  border: 2px solid #020617; /* Creates a padding effect */
+}
+
+/* 4. Hover Effect - Neural Glow */
+::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;     /* Blue-500: Lights up on hover */
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+/* For Firefox (Limited styling) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1e293b #020617;
+}
