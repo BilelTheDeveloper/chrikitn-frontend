@@ -14,10 +14,15 @@ import {
 } from 'lucide-react';
 
 const AdminPaymentAudit = () => {
-    const [payments, setPayments] = useState([]); // Initialized as empty array
+    const [payments, setPayments] = useState([]); 
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
+
+    // Detect if running locally or in production
+    const API_BASE_URL = window.location.hostname === 'localhost' 
+        ? 'http://localhost:5000' 
+        : ''; // Empty string uses relative path in production (Vercel/DigitalOcean)
 
     useEffect(() => {
         fetchPendingPayments();
@@ -27,11 +32,14 @@ const AdminPaymentAudit = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('/api/payments/pending', {
-                headers: { 'x-auth-token': token }
+            // ✅ FIX 1: Ensure full URL for local testing + correct headers
+            const res = await axios.get(`${API_BASE_URL}/api/payments/pending`, {
+                headers: { 
+                    'x-auth-token': token,
+                    'Authorization': `Bearer ${token}` // Added for authMiddleware consistency
+                }
             });
 
-            // 🛡️ CRITICAL FIX: Verify the data is an array before setting state
             if (res.data && Array.isArray(res.data)) {
                 setPayments(res.data);
             } else {
@@ -52,13 +60,17 @@ const AdminPaymentAudit = () => {
         setActionLoading(paymentId);
         try {
             const token = localStorage.getItem('token');
-            await axios.patch(`/api/payments/approve/${paymentId}`, {}, {
-                headers: { 'x-auth-token': token }
+            // ✅ FIX 2: Added full URL + both header types
+            await axios.patch(`${API_BASE_URL}/api/payments/approve/${paymentId}`, {}, {
+                headers: { 
+                    'x-auth-token': token,
+                    'Authorization': `Bearer ${token}`
+                }
             });
-            // Update UI by removing the validated item
+            
             setPayments(prev => prev.filter(p => p._id !== paymentId));
         } catch (err) {
-            alert("Protocol Failure: Could not finalize approval.");
+            alert("Protocol Failure: Could not finalize approval. Ensure you are an Admin.");
             console.error(err);
         } finally {
             setActionLoading(null);
@@ -82,11 +94,11 @@ const AdminPaymentAudit = () => {
     }
 
     return (
-        <div className="min-h-screen bg-transparent text-slate-300 animate-in fade-in duration-700">
+        <div className="min-h-screen bg-transparent text-slate-300 animate-in fade-in duration-700 p-4 md:p-8">
             {/* ⚡ HEADER SECTION */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
                 <div>
-                    <h1 className="text-3xl font-black text-white tracking-tighter uppercase italic italic">
+                    <h1 className="text-3xl font-black text-white tracking-tighter uppercase italic">
                         Payment <span className="text-blue-500">Audit</span>
                     </h1>
                     <div className="flex items-center gap-2 mt-1">
@@ -101,7 +113,7 @@ const AdminPaymentAudit = () => {
                         <input 
                             type="text" 
                             placeholder="Filter by operative name..."
-                            className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-xs focus:border-blue-500/50 outline-none transition-all"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-xs focus:border-blue-500/50 outline-none transition-all text-white"
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
@@ -117,8 +129,8 @@ const AdminPaymentAudit = () => {
             {/* 📊 GRID SECTION */}
             {filteredPayments.length === 0 ? (
                 <div className="h-[40vh] border border-dashed border-white/5 rounded-[2.5rem] flex flex-col items-center justify-center text-center p-10">
-                    <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-6 border border-white/5">
-                        <Zap size={24} className="text-slate-700" />
+                    <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-6 border border-white/5 text-slate-700">
+                        <Zap size={24} />
                     </div>
                     <h2 className="text-white font-bold uppercase tracking-widest text-sm">Clear Ledger</h2>
                     <p className="text-slate-500 text-xs mt-2 max-w-xs">No pending D17 evidence currently requires verification in this sector.</p>
