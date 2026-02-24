@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 import CollectiveCard from './CollectiveCard'; 
 import CollectiveUniverse from './CollectiveUniverse'; 
 // ✅ ADDED ONLY THIS IMPORT
-import SubscriptionPage from '../Subscription/SubscriptionPage'; 
+import SubscriptionPage from '../SubscriptionPage'; 
 
 const MainCollective = () => {
   const { user } = useAuth();
