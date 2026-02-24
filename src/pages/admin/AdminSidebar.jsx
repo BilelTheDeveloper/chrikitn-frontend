@@ -7,7 +7,8 @@ import {
   Crown, 
   Lock,
   LayoutDashboard,
-  Rocket // ✅ New Icon for Collective Deployment
+  Rocket, // ✅ New Icon for Collective Deployment
+  CreditCard // ✅ NEW: Icon for Payment Audit
 } from 'lucide-react';
 
 const AdminSidebar = ({ activeTab, setActiveTab, isSidebarOpen }) => {
@@ -33,6 +34,12 @@ const AdminSidebar = ({ activeTab, setActiveTab, isSidebarOpen }) => {
       id: 'vip_verification',
       label: 'VIP Intel',
       icon: <Crown size={18} />,
+    },
+    // ✅ NEW: Payment Audit Module
+    {
+      id: 'payment_audit',
+      label: 'D17 Audit',
+      icon: <CreditCard size={18} />,
     },
     // ✅ NEW: Collective Deployment Module
     {

@@ -27,11 +27,13 @@ import VipVerification from './pages/admin/VipVerification';
 import RoleVerification from './pages/admin/RoleVerification'; 
 import AdminAccess from './pages/admin/AdminAccess'; 
 import CollectiveVerification from './pages/admin/AdminCollectiveVerification'; // ✅ ADDED: Admin Collective Management
+import AdminPaymentAudit from './pages/admin/AdminPaymentAudit'; // ✅ NEW: D17 Verification
 
 // 5. User Main Layout & Sub-pages
 import Main from './pages/users/Mainn';
 import UserFeed from './pages/users/sub/UserFeed';
 import VipFeed from './pages/users/sub/VipFeed';
+import SubscriptionPage from './pages/users/SubscriptionPage'; // ✅ NEW: User Payment Portal
 
 // ✅ UPDATED COLLECTIVE IMPORTS
 import MotherCollective from './pages/users/collective/MotherCollective'; 
@@ -132,6 +134,9 @@ const AppContent = () => {
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="profile/:id" element={<Profile />} />
                 <Route path="profile" element={<Profile />} />
+
+                {/* ✅ NEW: SUBSCRIPTION PORTAL */}
+                <Route path="subscription" element={<SubscriptionPage />} />
               </Route>
           </Route>
 
@@ -146,7 +151,10 @@ const AppContent = () => {
                 <Route path="access" element={isAdmin ? <AdminAccess /> : <Navigate to="/" />} />
                 <Route path="vip-intel" element={isAdmin ? <VipVerification /> : <Navigate to="/" />} /> 
                 <Route path="roles" element={isAdmin ? <RoleVerification /> : <Navigate to="/" />} />
-                <Route path="collectives" element={isAdmin ? <CollectiveVerification /> : <Navigate to="/" />} /> {/* ✅ ADDED NEW ADMIN ROUTE */}
+                <Route path="collectives" element={isAdmin ? <CollectiveVerification /> : <Navigate to="/" />} /> 
+                
+                {/* ✅ NEW: ADMIN PAYMENT AUDIT */}
+                <Route path="payments" element={isAdmin ? <AdminPaymentAudit /> : <Navigate to="/" />} />
               </Route>
           </Route>
           

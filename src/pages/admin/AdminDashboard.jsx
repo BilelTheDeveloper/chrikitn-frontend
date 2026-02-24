@@ -9,6 +9,8 @@ import AdminAccess from './AdminAccess';
 import MainDashboard from './MainDashboard'; 
 // ✅ NEW IMPORT: The Collective Deployment Page
 import AdminCollectiveVerification from './AdminCollectiveVerification'; 
+// ✅ NEW: D17 Payment Audit Module
+import AdminPaymentAudit from './AdminPaymentAudit';
 
 const AdminDashboard = () => {
   // Set default to 'MainDashboard' so you see your stats immediately on login
@@ -40,6 +42,10 @@ const AdminDashboard = () => {
       // ✅ NEW CASE: The Syndicate Deployment Gate
       case 'collective_deployment': 
         return <AdminCollectiveVerification />;
+
+      // ✅ NEW CASE: D17 Evidence Verification
+      case 'payment_audit':
+        return <AdminPaymentAudit />;
       
       default:
         return (
