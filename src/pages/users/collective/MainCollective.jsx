@@ -21,17 +21,21 @@ const MainCollective = () => {
   const isFreelancer = user?.role === 'Freelancer';
   const isAdminOperative = user?.email === 'bilel.thedeveloper@gmail.com';
 
-  // ✅ NEW: ACCESS CALCULATION (Slow & Safe)
-  const now = new Date();
-  const expiryDate = new Date(user?.accessUntil);
-  const isExpired = now > expiryDate;
+  // ✅ ULTRA-SECURE ACCESS CALCULATION
+  // We use .getTime() to ensure we are comparing raw numbers, avoiding JS Date bugs
+  const now = new Date().getTime();
+  const expiryDate = user?.accessUntil ? new Date(user.accessUntil).getTime() : 0;
   
-  // If user is expired and NOT the admin (Bilel), they get the Ghost UI
-  const showSubscription = isExpired && !isAdminOperative;
+  // Logical triggers for the Ghost UI
+  const isExpired = now > expiryDate;
+  const isStasis = user?.status !== 'Active' || user?.isPaused === true;
+  
+  // The bypass: Admin (Bilel) never gets ghosted
+  const showSubscription = (isExpired || isStasis) && !isAdminOperative;
 
   // 📡 FETCH ACTIVE COLLECTIVES
   useEffect(() => {
-    // Only fetch if they aren't expired to avoid 403 errors from your middleware
+    // 🛡️ BLOCK FETCH IF EXPIRED
     if (showSubscription) return;
 
     const fetchCollectives = async () => {
@@ -48,10 +52,10 @@ const MainCollective = () => {
       }
     };
     fetchCollectives();
-  }, [user?._id, showSubscription]); // Added showSubscription to dependency
+  }, [user?._id, showSubscription]);
 
   // ✅ NEW: GHOSTING REDIRECT
-  // This swaps the view for TunisiaSmart (2025 date)
+  // If the user is TunisiaSmart (2025 date), this returns the Sub Page before any other UI
   if (showSubscription) {
     return <SubscriptionPage isExpiredMode={true} />;
   }
