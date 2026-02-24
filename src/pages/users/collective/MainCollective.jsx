@@ -6,7 +6,6 @@ import api from '../../../utils/api';
 import { toast } from 'react-hot-toast';
 import CollectiveCard from './CollectiveCard'; 
 import CollectiveUniverse from './CollectiveUniverse'; 
-// ✅ ADDED ONLY THIS IMPORT
 import SubscriptionPage from '../SubscriptionPage'; 
 
 const MainCollective = () => {
@@ -14,28 +13,29 @@ const MainCollective = () => {
   const navigate = useNavigate();
   const [collectives, setCollectives] = useState([]);
   const [fetching, setFetching] = useState(true);
-  
-  // ✅ WEB-IN-WEB STATE
   const [activeSyndicate, setActiveSyndicate] = useState(null);
 
   const isFreelancer = user?.role === 'Freelancer';
   const isAdminOperative = user?.email === 'bilel.thedeveloper@gmail.com';
 
   // ✅ ULTRA-SECURE ACCESS CALCULATION
-  // We use .getTime() to ensure we are comparing raw numbers, avoiding JS Date bugs
   const now = new Date().getTime();
-  const expiryDate = user?.accessUntil ? new Date(user.accessUntil).getTime() : 0;
   
-  // Logical triggers for the Ghost UI
+  // If user data is still loading or date is missing, we default to a safe value 
+  // to prevent a "flicker" lockout.
+  const expiryDate = user?.accessUntil ? new Date(user.accessUntil).getTime() : (now + 10000);
+  
   const isExpired = now > expiryDate;
-  const isStasis = user?.status !== 'Active' || user?.isPaused === true;
+
+  // ✅ REFINED STASIS CHECK: 
+  // We only trigger Stasis if they are explicitly 'Suspended' or 'isPaused'.
+  // This allows 'Pending' users to still see the grid if they have valid time.
+  const isStasis = user?.status === 'Suspended' || user?.isPaused === true;
   
-  // The bypass: Admin (Bilel) never gets ghosted
+  // The final trigger
   const showSubscription = (isExpired || isStasis) && !isAdminOperative;
 
-  // 📡 FETCH ACTIVE COLLECTIVES
   useEffect(() => {
-    // 🛡️ BLOCK FETCH IF EXPIRED
     if (showSubscription) return;
 
     const fetchCollectives = async () => {
@@ -54,24 +54,19 @@ const MainCollective = () => {
     fetchCollectives();
   }, [user?._id, showSubscription]);
 
-  // ✅ NEW: GHOSTING REDIRECT
-  // If the user is TunisiaSmart (2025 date), this returns the Sub Page before any other UI
   if (showSubscription) {
     return <SubscriptionPage isExpiredMode={true} />;
   }
 
-  // ✅ ULTRA UI RENDER: Active Syndicate Portal
   if (activeSyndicate) {
     return (
       <div className="relative">
-        {/* Back Button HUD */}
         <button 
           onClick={() => setActiveSyndicate(null)}
           className="fixed top-8 left-8 z-[200] px-6 py-3 bg-black/50 backdrop-blur-xl border border-white/10 rounded-full text-[10px] font-black uppercase tracking-[0.2em] text-white hover:bg-amber-500 hover:text-black transition-all"
         >
           ← Terminate Connection
         </button>
-
         <CollectiveUniverse 
           data={activeSyndicate} 
           isEditMode={isAdminOperative || activeSyndicate.owner?._id === user?._id}
@@ -80,7 +75,6 @@ const MainCollective = () => {
     );
   }
 
-  // --- STANDARD GRID VIEW ---
   return (
     <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8 overflow-x-hidden">
       <header className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 mb-16 pt-4">
@@ -94,7 +88,6 @@ const MainCollective = () => {
           </h1>
         </div>
 
-        {/* Updated Button to Navigate instead of opening Modal */}
         <button 
           hidden={!isFreelancer}
           onClick={() => navigate('/main/create-collective')}
