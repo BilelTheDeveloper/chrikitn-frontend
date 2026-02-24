@@ -4,7 +4,11 @@ import axios from 'axios';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  // ✅ INITIALIZE FROM LOCALSTORAGE: Prevents user being null on refresh
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [loading, setLoading] = useState(true);
 
   // 🛡️ AUTH CHECK: Run once when the app starts
@@ -17,8 +21,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        // ✅ SECURE UPDATE: Call the new backend route to get FRESH data from DB
-        // This ensures the 2025 expiration date is caught immediately
+        // ✅ FRESH DATA FETCH: Get latest status from DB
         const res = await axios.get('/api/auth/me', {
           headers: {
             Authorization: `Bearer ${token}`
@@ -27,7 +30,10 @@ export const AuthProvider = ({ children }) => {
 
         if (res.data.success) {
           const freshUserData = res.data.data;
+          
+          // ✅ SYNC STATE: Merge data ensuring subscription fields are present
           setUser(freshUserData);
+          
           // Keep localStorage in sync with the latest DB status
           localStorage.setItem('user', JSON.stringify(freshUserData));
         }

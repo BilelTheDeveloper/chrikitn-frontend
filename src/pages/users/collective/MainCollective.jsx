@@ -13,33 +13,32 @@ const MainCollective = () => {
   const navigate = useNavigate();
   const [collectives, setCollectives] = useState([]);
   const [fetching, setFetching] = useState(true);
+  
+  // ✅ WEB-IN-WEB STATE
   const [activeSyndicate, setActiveSyndicate] = useState(null);
 
   const isFreelancer = user?.role === 'Freelancer';
   const isAdminOperative = user?.email === 'bilel.thedeveloper@gmail.com';
 
-  // ✅ THE GHOST PROTOCOL CALCULATION
+  // ✅ ULTRA-SECURE ACCESS CALCULATION
+  // 1. Convert "now" to a raw number
   const now = Date.now();
   
-  // Convert the string date from localStorage into a comparable number
-  const expiryTimestamp = user?.accessUntil ? Date.parse(user.accessUntil) : (now + 86400000);
+  // 2. Parse the expiry date from the DB/localStorage into a raw number
+  // If the date is missing, we default to 0 (which means expired)
+  const expiryTimestamp = user?.accessUntil ? Date.parse(user.accessUntil) : 0;
   
-  // 1. Check if the date has passed (TunisiaSmart is 2025, so this is TRUE)
-  const isExpired = now > expiryTimestamp;
-  
-  // 2. Check the manual Kill Switch (You set this to TRUE in DB)
-  // We check for both boolean and string just in case of DB variations
+  // 3. Logic Triggers
+  const isExpired = expiryTimestamp !== 0 && now > expiryTimestamp;
   const isPaused = user?.isPaused === true || user?.isPaused === "true";
-  
-  // 3. Status check (Suspended accounts)
   const isSuspended = user?.status === 'Suspended';
-
-  // 🛡️ THE FINAL GATE
-  // If ANY of these are true, show the SubscriptionPage (Unless it's you, Bilel)
+  
+  // 4. The "Ghost" Trigger: Locks TunisiaSmart (2025) but allows ChrikiTn (2026)
   const showSubscription = (isExpired || isPaused || isSuspended) && !isAdminOperative;
 
-  // 📡 FETCH CONTROL
+  // 📡 FETCH ACTIVE COLLECTIVES
   useEffect(() => {
+    // 🛡️ BLOCK FETCH IF EXPIRED OR PAUSED
     if (showSubscription) return;
 
     const fetchCollectives = async () => {
@@ -58,12 +57,12 @@ const MainCollective = () => {
     fetchCollectives();
   }, [user?._id, showSubscription]);
 
-  // 🌑 GHOST UI REDIRECT
+  // ✅ NEW: GHOSTING REDIRECT
   if (showSubscription) {
     return <SubscriptionPage isExpiredMode={true} />;
   }
 
-  // 🌌 UNIVERSE VIEW
+  // ✅ ULTRA UI RENDER: Active Syndicate Portal
   if (activeSyndicate) {
     return (
       <div className="relative">
@@ -73,6 +72,7 @@ const MainCollective = () => {
         >
           ← Terminate Connection
         </button>
+
         <CollectiveUniverse 
           data={activeSyndicate} 
           isEditMode={isAdminOperative || activeSyndicate.owner?._id === user?._id}
