@@ -18,23 +18,27 @@ const MainCollective = () => {
   const isFreelancer = user?.role === 'Freelancer';
   const isAdminOperative = user?.email === 'bilel.thedeveloper@gmail.com';
 
-  // ✅ ULTRA-SECURE ACCESS CALCULATION
-  const now = new Date().getTime();
+  // ✅ THE GHOST PROTOCOL CALCULATION
+  const now = Date.now();
   
-  // If user data is still loading or date is missing, we default to a safe value 
-  // to prevent a "flicker" lockout.
-  const expiryDate = user?.accessUntil ? new Date(user.accessUntil).getTime() : (now + 10000);
+  // Convert the string date from localStorage into a comparable number
+  const expiryTimestamp = user?.accessUntil ? Date.parse(user.accessUntil) : (now + 86400000);
   
-  const isExpired = now > expiryDate;
+  // 1. Check if the date has passed (TunisiaSmart is 2025, so this is TRUE)
+  const isExpired = now > expiryTimestamp;
+  
+  // 2. Check the manual Kill Switch (You set this to TRUE in DB)
+  // We check for both boolean and string just in case of DB variations
+  const isPaused = user?.isPaused === true || user?.isPaused === "true";
+  
+  // 3. Status check (Suspended accounts)
+  const isSuspended = user?.status === 'Suspended';
 
-  // ✅ REFINED STASIS CHECK: 
-  // We only trigger Stasis if they are explicitly 'Suspended' or 'isPaused'.
-  // This allows 'Pending' users to still see the grid if they have valid time.
-  const isStasis = user?.status === 'Suspended' || user?.isPaused === true;
-  
-  // The final trigger
-  const showSubscription = (isExpired || isStasis) && !isAdminOperative;
+  // 🛡️ THE FINAL GATE
+  // If ANY of these are true, show the SubscriptionPage (Unless it's you, Bilel)
+  const showSubscription = (isExpired || isPaused || isSuspended) && !isAdminOperative;
 
+  // 📡 FETCH CONTROL
   useEffect(() => {
     if (showSubscription) return;
 
@@ -54,10 +58,12 @@ const MainCollective = () => {
     fetchCollectives();
   }, [user?._id, showSubscription]);
 
+  // 🌑 GHOST UI REDIRECT
   if (showSubscription) {
     return <SubscriptionPage isExpiredMode={true} />;
   }
 
+  // 🌌 UNIVERSE VIEW
   if (activeSyndicate) {
     return (
       <div className="relative">
