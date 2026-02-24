@@ -17,15 +17,29 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        // You can create a /api/auth/me route later to verify the token
-        // For now, we trust the stored user data in localStorage
-        const storedUser = JSON.parse(localStorage.getItem('user'));
-        if (storedUser) setUser(storedUser);
+        // ✅ SECURE UPDATE: Call the new backend route to get FRESH data from DB
+        // This ensures the 2025 expiration date is caught immediately
+        const res = await axios.get('/api/auth/me', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (res.data.success) {
+          const freshUserData = res.data.data;
+          setUser(freshUserData);
+          // Keep localStorage in sync with the latest DB status
+          localStorage.setItem('user', JSON.stringify(freshUserData));
+        }
       } catch (err) {
+        console.error("Session Protocol Failure:", err);
+        // If the token is invalid or expired, clear the local session
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     checkUserLoggedIn();
