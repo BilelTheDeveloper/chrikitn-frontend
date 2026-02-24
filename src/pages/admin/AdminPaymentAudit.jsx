@@ -29,8 +29,6 @@ const AdminPaymentAudit = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            // ✅ FIX: Using centralized API_BASE_URL from config
-            // Note: Since API_BASE_URL includes '/api', we just add '/payments/pending'
             const res = await axios.get(`${API_BASE_URL}/payments/pending`, {
                 headers: { 
                     'x-auth-token': token,
@@ -38,7 +36,11 @@ const AdminPaymentAudit = () => {
                 }
             });
 
-            if (res.data && Array.isArray(res.data)) {
+            // ✅ UPDATE: Backend now returns { success: true, data: [...] }
+            if (res.data && res.data.success && Array.isArray(res.data.data)) {
+                setPayments(res.data.data);
+            } else if (Array.isArray(res.data)) {
+                // Fallback for old structure
                 setPayments(res.data);
             } else {
                 console.error("Payload Error: Backend returned non-array data", res.data);
@@ -58,7 +60,6 @@ const AdminPaymentAudit = () => {
         setActionLoading(paymentId);
         try {
             const token = localStorage.getItem('token');
-            // ✅ FIX: Using centralized API_BASE_URL
             await axios.patch(`${API_BASE_URL}/payments/approve/${paymentId}`, {}, {
                 headers: { 
                     'x-auth-token': token,
@@ -66,6 +67,7 @@ const AdminPaymentAudit = () => {
                 }
             });
             
+            // ✅ Success: Filter out the approved payment from UI
             setPayments(prev => prev.filter(p => p._id !== paymentId));
         } catch (err) {
             alert("Protocol Failure: Could not finalize approval. Ensure you are an Admin.");
