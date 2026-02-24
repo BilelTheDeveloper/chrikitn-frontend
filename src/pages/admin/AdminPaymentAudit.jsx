@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+// ✅ IMPORT YOUR CONFIG
+import { API_BASE_URL } from '../../config/config'; 
 import { 
   CheckCircle, 
   XCircle, 
@@ -19,11 +21,6 @@ const AdminPaymentAudit = () => {
     const [actionLoading, setActionLoading] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
 
-    // Detect if running locally or in production
-    const API_BASE_URL = window.location.hostname === 'localhost' 
-        ? 'http://localhost:5000' 
-        : ''; // Empty string uses relative path in production (Vercel/DigitalOcean)
-
     useEffect(() => {
         fetchPendingPayments();
     }, []);
@@ -32,11 +29,12 @@ const AdminPaymentAudit = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            // ✅ FIX 1: Ensure full URL for local testing + correct headers
-            const res = await axios.get(`${API_BASE_URL}/api/payments/pending`, {
+            // ✅ FIX: Using centralized API_BASE_URL from config
+            // Note: Since API_BASE_URL includes '/api', we just add '/payments/pending'
+            const res = await axios.get(`${API_BASE_URL}/payments/pending`, {
                 headers: { 
                     'x-auth-token': token,
-                    'Authorization': `Bearer ${token}` // Added for authMiddleware consistency
+                    'Authorization': `Bearer ${token}` 
                 }
             });
 
@@ -60,8 +58,8 @@ const AdminPaymentAudit = () => {
         setActionLoading(paymentId);
         try {
             const token = localStorage.getItem('token');
-            // ✅ FIX 2: Added full URL + both header types
-            await axios.patch(`${API_BASE_URL}/api/payments/approve/${paymentId}`, {}, {
+            // ✅ FIX: Using centralized API_BASE_URL
+            await axios.patch(`${API_BASE_URL}/payments/approve/${paymentId}`, {}, {
                 headers: { 
                     'x-auth-token': token,
                     'Authorization': `Bearer ${token}`
