@@ -6,6 +6,8 @@ import api from '../../../utils/api';
 import { toast } from 'react-hot-toast';
 import CollectiveCard from './CollectiveCard'; 
 import CollectiveUniverse from './CollectiveUniverse'; 
+// ✅ ADDED ONLY THIS IMPORT
+import SubscriptionPage from '../Subscription/SubscriptionPage'; 
 
 const MainCollective = () => {
   const { user } = useAuth();
@@ -19,8 +21,19 @@ const MainCollective = () => {
   const isFreelancer = user?.role === 'Freelancer';
   const isAdminOperative = user?.email === 'bilel.thedeveloper@gmail.com';
 
+  // ✅ NEW: ACCESS CALCULATION (Slow & Safe)
+  const now = new Date();
+  const expiryDate = new Date(user?.accessUntil);
+  const isExpired = now > expiryDate;
+  
+  // If user is expired and NOT the admin (Bilel), they get the Ghost UI
+  const showSubscription = isExpired && !isAdminOperative;
+
   // 📡 FETCH ACTIVE COLLECTIVES
   useEffect(() => {
+    // Only fetch if they aren't expired to avoid 403 errors from your middleware
+    if (showSubscription) return;
+
     const fetchCollectives = async () => {
       try {
         setFetching(true);
@@ -35,7 +48,13 @@ const MainCollective = () => {
       }
     };
     fetchCollectives();
-  }, [user?._id]);
+  }, [user?._id, showSubscription]); // Added showSubscription to dependency
+
+  // ✅ NEW: GHOSTING REDIRECT
+  // This swaps the view for TunisiaSmart (2025 date)
+  if (showSubscription) {
+    return <SubscriptionPage isExpiredMode={true} />;
+  }
 
   // ✅ ULTRA UI RENDER: Active Syndicate Portal
   if (activeSyndicate) {
