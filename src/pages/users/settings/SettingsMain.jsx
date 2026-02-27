@@ -47,10 +47,8 @@ const SettingsMain = () => {
             </motion.div>
           </AnimatePresence>
         </main>
-
       </div>
     </div>
   );
 };
-
 export default SettingsMain;
