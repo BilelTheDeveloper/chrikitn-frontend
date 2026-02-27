@@ -5,7 +5,7 @@ import {
   ExternalLink, Rocket, Fingerprint, Award, 
   Globe, Shield, Cpu, Zap, ArrowRight, Target, Briefcase
 } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
 // HELPER: Connects to your backend storage
 const getImageUrl = (path) => {
   if (!path) return "https://via.placeholder.com/800";
@@ -78,7 +78,7 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false, currentUserEmail = 
 
     // ✅ CHECK FOR ADMIN ACCESS
     const hasAdminAccess = isEditMode || currentUserEmail === "bilel.thedeveloper@gmail.com";
-
+    const navigate = useNavigate();
     return (
         <div className="relative min-h-screen bg-[#020617] text-white selection:bg-amber-500/30 overflow-x-hidden font-sans">
             
@@ -206,13 +206,13 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false, currentUserEmail = 
                 </section>
 
                 {/* --- 3. SERVICES --- */}
-                <section>
+                <section >
                     <div className="mb-24">
                         <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter">Our Services</h2>
                         <p className="text-amber-500 text-xs font-black uppercase tracking-[0.4em] mt-4">Execution Frameworks & Strategic Delivery</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ">
                         {displayData.services.map((service, i) => (
                             <motion.div 
                                 key={i}
@@ -244,45 +244,59 @@ const CollectiveUniverse = ({ data = {}, isEditMode = false, currentUserEmail = 
 
                 {/* --- 4. THE TEAM (FIXED: OWNER + MEMBERS) --- */}
                 <section>
-                    <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
-                        <div>
-                            <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter">Our Team</h2>
-                            <p className="text-amber-500 text-xs font-black uppercase tracking-[0.4em] mt-4">Unified Strategic Syndicate</p>
+    <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+        <div>
+            <h2 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter text-white">Our Team</h2>
+            <p className="text-amber-500 text-xs font-black uppercase tracking-[0.4em] mt-4">Unified Strategic Syndicate</p>
+        </div>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        {displayData.members.map((member, i) => (
+            <motion.div 
+                key={member.id || i} 
+                whileHover={{ y: -20 }}
+                // ✅ UPDATED: Added Click Logic and Cursor Pointer
+                onClick={() => navigate(`/main/profile/${member.id}`)}
+                className="relative group cursor-pointer"
+            >
+                <div className="absolute inset-0 bg-gradient-to-b from-amber-500 to-transparent opacity-0 group-hover:opacity-10 blur-3xl transition-opacity" />
+                
+                <div className="relative bg-white/[0.02] border border-white/5 rounded-[3rem] p-10 overflow-hidden backdrop-blur-sm group-hover:border-amber-500/20 transition-all duration-500">
+                    
+                    <div className="relative w-32 h-32 mx-auto mb-8">
+                        <div className="absolute inset-0 border-2 border-dashed border-amber-500/30 rounded-full animate-[spin_10s_linear_infinite]" />
+                        <img 
+                            src={member.img} 
+                            className="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] object-cover rounded-full group-hover:grayscale-0 transition-all duration-700 shadow-2xl" 
+                            alt={member.name} 
+                        />
+                    </div>
+
+                    <div className="text-center space-y-2">
+                        <h3 className="text-2xl font-black uppercase tracking-tight text-white">{member.name}</h3>
+                        <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest">{member.role}</p>
+                    </div>
+
+                    {/* ✅ We stop propagation here so clicking the link doesn't trigger the card click twice */}
+                    <a 
+                        href={member.portfolio} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        onClick={(e) => e.stopPropagation()} 
+                        className="mt-10 pt-10 border-t border-white/5 flex justify-between items-center group/link"
+                    >
+                        <div className="flex items-center gap-2">
+                            <Award size={14} className="text-slate-500" />
+                            <span className="text-[9px] font-black text-slate-500 uppercase">{member.badge}</span>
                         </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                        {displayData.members.map((member, i) => (
-                            <motion.div 
-                                whileHover={{ y: -20 }}
-                                key={member.id || i} 
-                                className="relative group"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-b from-amber-500 to-transparent opacity-0 group-hover:opacity-10 blur-3xl transition-opacity" />
-                                <div className="relative bg-white/[0.02] border border-white/5 rounded-[3rem] p-10 overflow-hidden backdrop-blur-sm group-hover:border-amber-500/20 transition-all duration-500">
-                                    
-                                    <div className="relative w-32 h-32 mx-auto mb-8">
-                                        <div className="absolute inset-0 border-2 border-dashed border-amber-500/30 rounded-full animate-[spin_10s_linear_infinite]" />
-                                        <img src={member.img} className="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] object-cover rounded-full grayscale group-hover:grayscale-0 transition-all duration-700 shadow-2xl" alt={member.name} />
-                                    </div>
-
-                                    <div className="text-center space-y-2">
-                                        <h3 className="text-2xl font-black uppercase tracking-tight">{member.name}</h3>
-                                        <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest">{member.role}</p>
-                                    </div>
-
-                                    <a href={member.portfolio} target="_blank" rel="noopener noreferrer" className="mt-10 pt-10 border-t border-white/5 flex justify-between items-center group/link">
-                                        <div className="flex items-center gap-2">
-                                            <Award size={14} className="text-slate-500" />
-                                            <span className="text-[9px] font-black text-slate-500 uppercase">{member.badge}</span>
-                                        </div>
-                                        <ArrowRight size={20} className="text-white/20 group-hover:text-amber-500 group-hover/link:translate-x-2 transition-all" />
-                                    </a>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </section>
+                        <ArrowRight size={20} className="text-white/20 group-hover:text-amber-500 group-hover/link:translate-x-2 transition-all" />
+                    </a>
+                </div>
+            </motion.div>
+        ))}
+    </div>
+</section>
 
                 {/* --- 5. MISSION ARCHIVE --- */}
                 <section className="pb-40">
