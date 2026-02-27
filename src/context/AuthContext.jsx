@@ -87,8 +87,8 @@ export const AuthProvider = ({ children }) => {
   const { activate } = useIdleTimer({
     onIdle,
     onPrompt,
-    timeout: 1 * 60 * 1000, // 12 Minutes
-    promptTimeout: 10 * 1000, // 30 Seconds warning
+    timeout: 10 * 60 * 1000, // 12 Minutes
+    promptTimeout: 30 * 1000, // 30 Seconds warning
     throttle: 500,
     crossTab: true // Syncs logout across all open browser tabs
   });
@@ -113,7 +113,7 @@ export const AuthProvider = ({ children }) => {
             <div className="space-y-2">
               <h2 className="text-white font-black uppercase tracking-tighter text-2xl italic">Session Timeout</h2>
               <p className="text-slate-400 text-xs font-medium leading-relaxed">
-                Operative, you have been inactive for 12 minutes. We will terminate this connection in 30 seconds for your security.
+                Operative, you have been inactive for 10 minutes. We will terminate this connection in 30 seconds for your security.
               </p>
             </div>
 
