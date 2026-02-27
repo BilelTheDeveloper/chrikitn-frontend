@@ -26,19 +26,22 @@ import UserVerification from './pages/admin/UserVerification';
 import VipVerification from './pages/admin/VipVerification'; 
 import RoleVerification from './pages/admin/RoleVerification'; 
 import AdminAccess from './pages/admin/AdminAccess'; 
-import CollectiveVerification from './pages/admin/AdminCollectiveVerification'; // ✅ ADDED: Admin Collective Management
-import AdminPaymentAudit from './pages/admin/AdminPaymentAudit'; // ✅ NEW: D17 Verification
+import CollectiveVerification from './pages/admin/AdminCollectiveVerification'; 
+import AdminPaymentAudit from './pages/admin/AdminPaymentAudit'; 
 
 // 5. User Main Layout & Sub-pages
 import Main from './pages/users/Mainn';
 import UserFeed from './pages/users/sub/UserFeed';
 import VipFeed from './pages/users/sub/VipFeed';
-import SubscriptionPage from './pages/users/SubscriptionPage'; // ✅ NEW: User Payment Portal
+import SubscriptionPage from './pages/users/SubscriptionPage'; 
+
+// ✅ SETTINGS SYSTEM IMPORTS
+import SettingsMain from './pages/users/settings/SettingsMain';
 
 // ✅ UPDATED COLLECTIVE IMPORTS
 import MotherCollective from './pages/users/collective/MotherCollective'; 
 import CollectiveUniverse from './pages/users/collective/CollectiveUniverse';
-import CreateCollective from './pages/users/collective/CreateCollective'; // ✅ IMPORTED NEW PAGE
+import CreateCollective from './pages/users/collective/CreateCollective'; 
 
 import Notifications from './pages/users/sub/Notifications'; 
 import Profile from './pages/users/Profile'; 
@@ -74,15 +77,12 @@ const UnderReview = () => (
 const AppContent = () => {
   const location = useLocation();
   
-  // ✅ ENHANCED LOGIC: Hides Navbar/Footer if URL contains 'admin' OR starts with 'main'
   const isImmersivePath = location.pathname.toLowerCase().includes('admin') || location.pathname.startsWith('/main');
 
-  // 🛡️ AUTHENTICATION LOGIC
   const userData = JSON.parse(localStorage.getItem('user')) || {}; 
   const userRole = userData?.role || 'Normal';
   const userSyndicateId = userData?.collectiveId || null;
 
-  // 🔒 ROLE GATEKEEPER 
   const isAdmin = userData?.isAdmin === true && userData?.status === 'Active'; 
   const hasVipAccess = (userRole === 'Freelancer' || userRole === 'Brand' || isAdmin) && userData?.status === 'Active';
 
@@ -106,7 +106,7 @@ const AppContent = () => {
           {/* GATEKEEPER ROUTE */}
           <Route path="/status" element={<UnderReview />} />
 
-          {/* 🔒 PROTECTED USER ROUTES (Requires 'Active' status) */}
+          {/* 🔒 PROTECTED USER ROUTES */}
           <Route element={<ProtectedRoute />}>
               <Route path="/main" element={<Main />}>
                 <Route index element={<UserFeed />} /> 
@@ -115,16 +115,15 @@ const AppContent = () => {
                   element={hasVipAccess ? <VipFeed /> : <VipAccessDenied />} 
                 />
                 
-                {/* ✅ COLLECTIVE SYSTEM */}
+                {/* ✅ SETTINGS HUB */}
+                <Route path="settings" element={<SettingsMain />} />
+
                 <Route 
                   path="collective" 
                   element={<MotherCollective userRole={userRole} userSyndicateId={userSyndicateId} />} 
                 />
                 
-                {/* ✅ NEW: DEDICATED PAGE FOR CREATION */}
                 <Route path="create-collective" element={<CreateCollective />} />
-
-                {/* ✅ ROUTE TO ENTER A SPECIFIC UNIVERSE (READ ONLY) */}
                 <Route path="collective/:id" element={<CollectiveUniverse isEditMode={false} />} />
 
                 <Route path="apply-vip" element={<VipApplicationForm />} /> 
@@ -135,12 +134,11 @@ const AppContent = () => {
                 <Route path="profile/:id" element={<Profile />} />
                 <Route path="profile" element={<Profile />} />
 
-                {/* ✅ NEW: SUBSCRIPTION PORTAL */}
                 <Route path="subscription" element={<SubscriptionPage />} />
               </Route>
           </Route>
 
-          {/* 🔐 ADMIN ROUTES (Requires 'Active' status + Admin Whitelist) */}
+          {/* 🔐 ADMIN ROUTES */}
           <Route element={<ProtectedRoute />}>
               <Route 
                 path="/admin" 
@@ -152,13 +150,10 @@ const AppContent = () => {
                 <Route path="vip-intel" element={isAdmin ? <VipVerification /> : <Navigate to="/" />} /> 
                 <Route path="roles" element={isAdmin ? <RoleVerification /> : <Navigate to="/" />} />
                 <Route path="collectives" element={isAdmin ? <CollectiveVerification /> : <Navigate to="/" />} /> 
-                
-                {/* ✅ NEW: ADMIN PAYMENT AUDIT */}
                 <Route path="payments" element={isAdmin ? <AdminPaymentAudit /> : <Navigate to="/" />} />
               </Route>
           </Route>
           
-          {/* FALLBACKS */}
           <Route path="/admin/*" element={isAdmin ? <AdminDashboard /> : <Navigate to="/" />} />
           <Route path="/profile/:id" element={<Profile />} /> 
           <Route path="*" element={<Navigate to="/" />} />

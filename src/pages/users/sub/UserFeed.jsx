@@ -89,13 +89,13 @@ const UserFeed = () => {
           <div className="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center">
             <Activity size={18} className="text-blue-500" />
           </div>
-          <span className="text-slate-500 text-sm font-medium tracking-tight">Ready to launch a new project node?</span>
+          <span className="text-slate-400 text-l font-medium tracking-tight">Post your idea. Find your co-creator.</span>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)} 
           className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
         >
-          <Plus size={16} /> Add Post
+          <Plus size={16} />  Post
         </button>
       </div>
 

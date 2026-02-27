@@ -83,8 +83,8 @@ const Main = () => {
 
   // ✅ UPDATED NAV ITEMS: Added Collectives
   const navItems = [
-    { name: 'Feed', path: '/main', icon: <LayoutGrid size={18} /> },
-    { name: 'VipFeed', path: '/main/vip', icon: <Flame size={18} /> },
+    { name: 'Fikra', path: '/main', icon: <LayoutGrid size={18} /> },
+    { name: 'Talent Circle', path: '/main/vip', icon: <Flame size={18} /> },
     { name: 'Collectives', path: '/main/collective', icon: <Users size={18} /> },
     { name: 'Chat', path: '/main/Connections', icon: <Inbox size={18} /> }
   ];

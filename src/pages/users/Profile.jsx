@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { 
@@ -13,6 +13,7 @@ import { API_BASE_URL, SOCKET_URL } from '../../config/config';
 
 const Profile = () => {
   const { id } = useParams(); 
+  const navigate = useNavigate(); 
   const [profileUser, setProfileUser] = useState(null);
   const [latestPost, setLatestPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,11 +21,9 @@ const Profile = () => {
   const loggedInUser = JSON.parse(localStorage.getItem('user'));
   const isOwnProfile = loggedInUser?.id === id || loggedInUser?._id === id;
 
-  // ✅ IMPROVED: Helper to fix image paths using global config
   const getImageUrl = (path) => {
     if (!path) return null;
-    if (path.startsWith('http')) return path; // Handles Cloudinary/External links
-    // Handles local uploads by prefixing the SOCKET_URL (Base Server URL)
+    if (path.startsWith('http')) return path; 
     return `${SOCKET_URL}${path.startsWith('/') ? '' : '/'}${path}`;
   };
 
@@ -32,7 +31,6 @@ const Profile = () => {
     const fetchProfileData = async () => {
       try {
         setLoading(true);
-        // ✅ UPDATED: Uses API_BASE_URL
         const res = await axios.get(`${API_BASE_URL}/users/profile/${id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         });
@@ -70,7 +68,6 @@ const Profile = () => {
         </div>
 
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-          {/* Avatar Area */}
           <div className="relative">
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-[2rem] blur opacity-20"></div>
             <div className="relative w-32 h-32 bg-slate-950 rounded-[2rem] border border-white/10 flex items-center justify-center overflow-hidden">
@@ -90,7 +87,6 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* User Identity Info */}
           <div className="text-center md:text-left flex-1">
             <h1 className="text-3xl font-black text-white uppercase tracking-tighter italic">
               {profileUser?.name || 'Authorized Operative'}
@@ -108,7 +104,10 @@ const Profile = () => {
 
           <div className="flex flex-col gap-2 w-full md:w-auto">
             {isOwnProfile ? (
-              <button className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 group">
+              <button 
+                onClick={() => navigate('/main/settings')} 
+                className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10 group"
+              >
                 <Settings size={14} className="group-hover:rotate-90 transition-transform" /> Account Settings
               </button>
             ) : (

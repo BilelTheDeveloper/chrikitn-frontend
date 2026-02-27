@@ -87,7 +87,7 @@ export const AuthProvider = ({ children }) => {
   const { activate } = useIdleTimer({
     onIdle,
     onPrompt,
-    timeout: 10 * 60 * 1000, // 12 Minutes
+    timeout: 15 * 60 * 1000, // 12 Minutes
     promptTimeout: 30 * 1000, // 30 Seconds warning
     throttle: 500,
     crossTab: true // Syncs logout across all open browser tabs
