@@ -49,6 +49,9 @@ import Profile from './pages/users/Profile';
 // NEW: MISSION REQUEST PAGE
 import RequestMissionPage from './pages/users/sub/RequestMissionPage'; 
 
+// ✅ NEW: COLLABORATION PITCH PAGE
+import CollaborationPitch from './pages/users/sub/CollaborationPitch';
+
 // ✅ NEW: SECURE COMMUNICATION PAGES
 import Connections from './pages/users/Connections'; 
 import ChatRoom from './pages/users/ChatRoom'; 
@@ -130,6 +133,10 @@ const AppContent = () => {
                 <Route path="connections" element={<Connections />} />
                 <Route path="chat/:connectionId" element={<ChatRoom />} />
                 <Route path="request-mission/:postId" element={<RequestMissionPage />} />
+                
+                {/* ✅ NEW COLLABORATION PITCH ROUTE */}
+                <Route path="pitch/:postId" element={<CollaborationPitch />} />
+
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="profile/:id" element={<Profile />} />
                 <Route path="profile" element={<Profile />} />

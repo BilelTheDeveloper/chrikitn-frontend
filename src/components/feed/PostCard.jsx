@@ -90,7 +90,7 @@ const PostCard = ({ post }) => {
         <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
           <div className="flex items-center gap-2 mb-1">
             <Target size={14} className="text-blue-400" />
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">The Need:</span>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">The Need :</span>
           </div>
           <p className="text-xs text-white font-semibold leading-relaxed">
             {post.goal}
@@ -98,12 +98,16 @@ const PostCard = ({ post }) => {
         </div>
       </div>
 
-      {/* Action Button */}
+      {/* Action Button - Updated with Link and New Text */}
       <div className="mt-auto pt-4 border-t border-white/5">
-        <button className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase tracking-widest text-[11px] rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20">
+        <Link 
+          to={`/main/pitch/${post._id}`}
+          state={{ project: { title: post.globalVision, domain: post.domain } }}
+          className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold uppercase tracking-widest text-[11px] rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20"
+        >
           <Send size={14} />
-          Connect & Help
-        </button>
+          Apply to Collaborate
+        </Link>
       </div>
     </motion.div>
   );
